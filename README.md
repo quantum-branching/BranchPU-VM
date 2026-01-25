@@ -117,12 +117,19 @@ Compares a register value against the accumulator and sets the comparison flag (
 
 Mode: Condition tested
  0 : Never
- 1  :`R[reg] > A`
+ 
+ 1 :`R[reg] > A`
+ 
  2 : `R[reg] == A`
+ 
  3 : `R[reg] >= A`
+ 
  4 : Always
+ 
  5 : `R[reg] <= A`
+ 
  6 : `R[reg] != A`
+ 
  7 : `R[reg] < A`
 
 *Note: All comparisons are **unsigned**.*
