@@ -1,0 +1,45 @@
+[gd_scene load_steps=6 format=3 uid="uid://d1di26y8xw48g"]
+
+[ext_resource type="Texture2D" uid="uid://bch3wnnc00m5v" path="res://Play.png" id="1_glv2v"]
+[ext_resource type="FontFile" uid="uid://bhnvaew26rdh" path="res://minecraftfont.ttf" id="1_r0du0"]
+[ext_resource type="Script" uid="uid://dio5wnbp23b7l" path="res://run.gd" id="2_uu6xs"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_r0du0"]
+size = Vector2(1152, -648)
+center_offset = Vector3(576, 324, 0)
+
+[sub_resource type="SyntaxHighlighter" id="SyntaxHighlighter_r0du0"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="."]
+modulate = Color(0, 0, 0, 1)
+mesh = SubResource("QuadMesh_r0du0")
+
+[node name="Edit" type="CodeEdit" parent="."]
+unique_name_in_owner = true
+offset_right = 1152.0
+offset_bottom = 648.0
+theme_override_fonts/font = ExtResource("1_r0du0")
+syntax_highlighter = SubResource("SyntaxHighlighter_r0du0")
+symbol_tooltip_on_hover = true
+line_folding = true
+gutters_draw_breakpoints_gutter = true
+gutters_draw_line_numbers = true
+gutters_draw_fold_gutter = true
+code_completion_enabled = true
+auto_brace_completion_enabled = true
+auto_brace_completion_highlight_matching = true
+
+[node name="Run" type="TextureButton" parent="."]
+offset_left = 1076.0
+offset_top = 574.0
+offset_right = 1204.0
+offset_bottom = 702.0
+scale = Vector2(0.5, 0.5)
+texture_normal = ExtResource("1_glv2v")
+texture_pressed = ExtResource("1_glv2v")
+texture_hover = ExtResource("1_glv2v")
+texture_disabled = ExtResource("1_glv2v")
+texture_focused = ExtResource("1_glv2v")
+script = ExtResource("2_uu6xs")
