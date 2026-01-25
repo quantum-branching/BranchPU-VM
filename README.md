@@ -1,5 +1,3 @@
-# BranchPU-VM
-
 # Instruction Set Architecture (ISA) Reference
 
 This ISA defines a simple accumulator-based CPU with unsigned, 8-bit, modulo-256 arithmetic.
