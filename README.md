@@ -32,6 +32,7 @@ PC → 256 × arg1 + arg2
 Conditional jump.
 
 if CF == true:
+
     PC → 256 × arg1 + arg2
 
 ### `PSH #arg1 #arg2`
