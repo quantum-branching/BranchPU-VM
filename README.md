@@ -117,7 +117,7 @@ Compares a register value against the accumulator and sets the comparison flag (
 
 Mode: Condition tested
 
- 0 : Never
+ 0 : `False`
  
  1 :`R[reg] > A`
  
@@ -125,7 +125,7 @@ Mode: Condition tested
  
  3 : `R[reg] >= A`
  
- 4 : Always
+ 4 : `True`
  
  5 : `R[reg] <= A`
  
