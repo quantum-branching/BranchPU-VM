@@ -49,22 +49,22 @@ No operation.
 
 ## Data Movement Instructions
 
-### `LDA $reg`
+### `LDA $arg1`
 Load a register value into the accumulator.
 
 A → R[reg]
 
-### `LDI #imm`
+### `LDI #arg1`
 Load an immediate value into the accumulator.
 
 A → imm
 
-### `STA $reg`
+### `STA $arg1`
 Store the accumulator into a register.
 
 R[reg] → A
 
-### `STI #imm`
+### `STI #arg1`
 Store the immediate value to register 0.
 
 R[0] → imm
@@ -73,48 +73,50 @@ R[0] → imm
 
 All arithmetic wraps modulo 256.
 
-### `ADD $reg`
+### `ADD $arg1`
 Add a register to the accumulator.
 
 A → A + R[reg]
 
-### `SUB $reg`
+### `SUB $arg1`
 Subtract a register from the accumulator.
 
 A → A - R[reg]
 
 ## Bitwise Instructions
 
-### `AND $reg`
+### `AND $arg1`
 Bitwise AND between the accumulator and a register.
 A → A & R[reg]
 
-### `OR $reg`
+### `OR $arg1`
 Bitwise OR between the accumulator and a register.
 A → A | R[reg]
 
-### `XOR $reg`
+### `XOR $arg1`
 Bitwise XOR between the accumulator and a register.
 A → A ^ R[reg]
 
 ## Shift Instructions
 
-### `LSH $reg`
+### `LSH $arg1`
 Logical left shift of the accumulator.
 
 A → (A << R[reg]) mod 256
+
 *Note: High bits are discarded.*
 
 
-### `RSH $reg`
+### `RSH $arg1`
 Logical right shift of the accumulator.
 
 A → A >> R[reg]
+
 *Note: Zero-fill; high bits are shifted in as `0`.*
 
 ## Comparison Instruction
 
-### `CMP mode #reg`
+### `CMP mode #arg1`
 Compares a register value against the accumulator and sets the comparison flag (`CF`).
 
 Mode: Condition tested
