@@ -116,6 +116,7 @@ A → A >> R[reg]
 Compares a register value against the accumulator and sets the comparison flag (`CF`).
 
 Mode: Condition tested
+
  0 : Never
  
  1 :`R[reg] > A`
