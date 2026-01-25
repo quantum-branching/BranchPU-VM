@@ -31,8 +31,10 @@ PC → 256 × arg1 + arg2
 ### `CND #arg1 #arg2`
 Conditional jump.
 
-```if CF == true:
-    PC → 256 × arg1 + arg2```
+```
+if CF == true:
+    PC → 256 × arg1 + arg2
+```
 
 ### `PSH #arg1 #arg2`
 Pushes the current program counter onto the stack and jumps to a specified instruction.
