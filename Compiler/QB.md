@@ -28,7 +28,7 @@
 | `>>`   | Right bit shift |
 | `&`    | Bitwise AND |
 | `^`    | Bitwise XOR |
-| `|`    | Bitwise OR |
+| `\|`    | Bitwise OR |
 | `!`    | Logical NOT / bitwise inversion |
 
 ---
