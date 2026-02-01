@@ -16,6 +16,7 @@ All arithmetic operations **wrap modulo 256**.
 ## Addressing
 
 * Immediate values are prefixed with `#`
+* Register values can optionally be pre prefixed with `$`
 * Register operands are referenced by index
 
 Jump targets are absolute and computed as: Address = 256 × arg1 + arg2
@@ -26,7 +27,9 @@ Jump targets are absolute and computed as: Address = 256 × arg1 + arg2
 
 Unconditional jump.
 
+```
 PC → 256 × arg1 + arg2
+```
 
 ### `CND #arg1 #arg2`
 Conditional jump.
@@ -39,7 +42,9 @@ if CF == true:
 ### `PSH #arg1 #arg2`
 Pushes the current program counter onto the stack and jumps to a specified instruction.
 
+```
 PC → 256 × arg1 + arg2
+```
 
 ### `POP`
 Pops a program counter value from the stack and jumps to it.
@@ -52,22 +57,30 @@ No operation.
 ### `LDA $arg1`
 Load a register value into the accumulator.
 
+```
 A → R[reg]
+```
 
 ### `LDI #arg1`
 Load an immediate value into the accumulator.
 
+```
 A → imm
+```
 
 ### `STA $arg1`
 Store the accumulator into a register.
 
+```
 R[reg] → A
+```
 
 ### `STI #arg1`
 Store the immediate value to register 0.
 
+```
 R[0] → imm
+```
 
 ## Arithmetic Instructions
 
@@ -76,33 +89,48 @@ All arithmetic wraps modulo 256.
 ### `ADD $arg1`
 Add a register to the accumulator.
 
+```
 A → A + R[reg]
+```
 
 ### `SUB $arg1`
 Subtract a register from the accumulator.
 
+```
 A → A - R[reg]
+```
 
 ## Bitwise Instructions
 
 ### `AND $arg1`
 Bitwise AND between the accumulator and a register.
+
+```
 A → A & R[reg]
+```
 
 ### `OR $arg1`
 Bitwise OR between the accumulator and a register.
+
+```
 A → A | R[reg]
+```
 
 ### `XOR $arg1`
 Bitwise XOR between the accumulator and a register.
+
+```
 A → A ^ R[reg]
+```
 
 ## Shift Instructions
 
 ### `LSH $arg1`
 Logical left shift of the accumulator.
 
+```
 A → (A << R[reg]) mod 256
+```
 
 *Note: High bits are discarded.*
 
@@ -110,7 +138,9 @@ A → (A << R[reg]) mod 256
 ### `RSH $arg1`
 Logical right shift of the accumulator.
 
+```
 A → A >> R[reg]
+```
 
 *Note: Zero-fill; high bits are shifted in as `0`.*
 
