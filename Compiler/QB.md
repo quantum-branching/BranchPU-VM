@@ -88,12 +88,12 @@ func add(int x, int y){
 }
 
 // Bitwise operations
-var a:int = 5
-var b:int = 3
-var c:int = a & b   // AND
-var d:int = a | b   // OR
-var e:int = a ^ b   // XOR
-var f:int = a << 1  // Left shift
-var g:int = b >> 1  // Right shift
-var h:int = !a      // NOT
+int a = 5
+int b = 3
+int c = a & b   // AND
+int d = a | b   // OR
+int e = a ^ b   // XOR
+int f = a << 1  // Left shift
+int g = b >> 1  // Right shift
+int h = !a      // NOT
 ```
