@@ -16,6 +16,7 @@ All arithmetic operations **wrap modulo 256**.
 ## Addressing
 
 * Immediate values are prefixed with `#`
+* Register values can optionally be pre prefixed with `$`
 * Register operands are referenced by index
 
 Jump targets are absolute and computed as: Address = 256 × arg1 + arg2
@@ -26,7 +27,9 @@ Jump targets are absolute and computed as: Address = 256 × arg1 + arg2
 
 Unconditional jump.
 
+```
 PC → 256 × arg1 + arg2
+```
 
 ### `CND #arg1 #arg2`
 Conditional jump.
