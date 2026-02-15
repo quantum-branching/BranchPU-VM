@@ -51,26 +51,41 @@
 
 | Cast | Meaning |
 |------|---------|
-| `func -> [type]` | Calls the function and returns the accumulator cast to `[type]` |
-| `int -> char` | Returns `int.to_ascii()` |
-| `int -> bool` | Returns `1` if `int > 0`, else `0` |
-| `char -> int` | Returns `char.from_ascii()` |
-| `char -> bool` | Returns `1` if `char.from_ascii() > 0`, else `0` |
-| `bool -> char` | Returns `0.to_ascii()` if false, `1.to_ascii()` if true |
+| `func` -> `[type]` | Calls the function and returns the accumulator cast to `[type]` |
+| `int` -> `char` | Returns `int.to_ascii()` |
+| `int` -> `bool` | Returns `1` if `int > 0`, else `0` |
+| `char` -> `int` | Returns `char.from_ascii()` |
+| `char` -> `bool` | Returns `1` if `char.from_ascii() > 0`, else `0` |
+| `bool` -> `char` | Returns `0.to_ascii()` if false, `1.to_ascii()` if true |
 
 ---
 
-## 4. Notes on Behavior
+## 4. Order of Operations
+
+| Priority | Operations | Notes |
+|----------|------------|-------|
+| 0 | `(`,`)`| Can slow down references if parenthesis affect operation order |
+| 1 | `*`,`/`| Depends on software libraries |
+| 2 | `>>`,`<<`| |
+| 3 | `\|`,`&`,`^` | Use for boolean manipulation as well (with `and true`) |
+| 4 | `+`,`-` | |
+
+Executes lower priority operations before higher priority operations. Prioritizes operations in parenthesis over other operations.
+
+---
+
+## 5. Notes on Behavior
 
 - All scalar types are **8-bit integers at runtime**; types are **compile-time interpretations**.  
-- **Arrays and dictionaries cannot be cast as a whole**, only elements can be accessed via `.` notation.  
+- **Arrays and dictionaries cannot be cast as a whole**, only elements can be accessed via `.` notation.
+  - *This means that* `[idx]` *does not access array elements.*
 - **Strings** are arrays of ASCII values; **characters** are single ASCII integers.  
 - **Boolean logic**: any non-zero integer is `true`, `0` is `false`.  
 - **Operations** support arithmetic, bitwise, and logical operators.  
 
 ---
 
-## 5. Example Usage
+## 6. Example Usage
 
 ```C
 // Define variables
