@@ -8,7 +8,7 @@ var time2:float = 1.0
 
 func _ready() -> void:
 	for i in OS.get_cmdline_args():
-		if i.ends_with(".bpu"):
+		if i.ends_with(".qb"):
 			%Edit.text = FileAccess.get_file_as_string(i)
 			code = %Edit.text
 	%Edit.syntax_highlighter = AssemblyHighligher.new(%Edit)
