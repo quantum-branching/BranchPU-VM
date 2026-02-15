@@ -1,0 +1,46 @@
+JMP 0 .math_main
+
+.math_multiply
+	LDI 0;
+	STA 3;
+	.math_mult_loop
+	CST 1;
+	LDA 2;
+	CMP 1 0;
+	CND 0 .math_mult_ret;
+		LDA 2;
+		AND 0;
+		CMP 1 0;
+		CND 0 .math_mult_rest;
+			LDA 3;
+			ADD 1;
+			STA 3;
+		.math_mult_rest
+		LDA 1;
+		LSH 0;
+		STA 1;
+		LDA 2;
+		RSH 0;
+		STA 2;
+		JMP 0 .math_mult_loop;
+	.math_mult_ret
+	LDA 3;
+	POP;
+
+.math_divide
+	LDI 0; divide($01,$02)
+	STA 3; Result
+	CST 1;
+	.math_div_dec
+		LDA 3;
+		ADD 0;
+		STA 3;
+		LDA 1;
+		SUB 2;
+		CMP 1  2;
+		STA 1;
+		CND 0 .math_div_dec;
+	LDA 3;
+	POP;
+
+.math_main
