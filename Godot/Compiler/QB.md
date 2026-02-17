@@ -53,10 +53,11 @@
 |------|---------|
 | `func` -> `[type]` | Calls the function and returns the accumulator cast to `[type]` |
 | `int` -> `char` | Returns `int.to_ascii()` |
-| `int` -> `bool` | Returns `1` if `int > 0`, else `0` |
+| `int` -> `bool` | Returns `true` if `int > 0`, else `false` |
 | `char` -> `int` | Returns `char.from_ascii()` |
-| `char` -> `bool` | Returns `1` if `char.from_ascii() > 0`, else `0` |
-| `bool` -> `char` | Returns `0.to_ascii()` if false, `1.to_ascii()` if true |
+| `char` -> `bool` | Returns `true` if `char.from_ascii() > 0`, else `false` |
+| `bool` -> `char` | Returns `0.to_ascii()` if false, any other character if true |
+| `bool` -> `int` | Returns `0` if false, any other number if true |
 
 ---
 
