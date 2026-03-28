@@ -3,7 +3,7 @@
 ### Obtaining Executable
 
 Download pre-compiled Executable (Windows or Linux)
-* Navigate to Releases
+* [Navigate to Releases](https://github.com/quantum-branching/BranchPU-VM/releases)
 * Download appropriate Executable
 
 Compile from Source (Any platform)
