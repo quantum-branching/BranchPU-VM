@@ -4,47 +4,22 @@
 #include <stdint.h>
 #include <string.h>
 
-uint8_t instructions[2048];
-uint8_t arguments[2048];										
-uint8_t registers[256];
+#define ISA_SIZE 20
+#define MAX_LINE_LENGTH 128
+#define PROGRAM_SIZE 2048
+#define REGISTERS 256
 
+//The opcode for every instruction that is in the program
+uint8_t instructions[PROGRAM_SIZE];
+//The argument for every instruction that is in the program
+uint8_t arguments[PROGRAM_SIZE];
+
+//The instruction that is currently being executed (program counter)
 int instruction;
+//The state of the 256 byte memory
+uint8_t registers[REGISTERS];
+//The state of the accumulator - the value being modified by instructions
 uint8_t accumulator;
-
-char* getSlice(char text[], char delimiter, int idx) {
-    int start = 0;
-    int currentIdx = 0;
-    int i = 0;
-    // Find the start of the desired slice
-    while (text[i] != '\0') {
-        if (currentIdx == idx) {
-            start = i;
-            break;
-        }
-        if (text[i] == delimiter) {
-            currentIdx++;
-        }
-        i++;
-    }
-    // If index not found
-    if (currentIdx != idx) {
-        return NULL;
-    }
-    // Find the end of the slice
-    int end = start;
-    while (text[end] != '\0' && text[end] != delimiter) {
-        end++;
-    }
-    // Allocate memory for the slice (+1 for null terminator)
-    int length = end - start;
-    char *slice = (char *)malloc(length + 1);
-    if (!slice) {
-		return NULL;
-	}
-    strncpy(slice, text + start, length);
-    slice[length] = '\0';
-    return slice;
-}
 
 bool startsWith(char text[], char sub[]) {
 	int size = strlen(sub);
@@ -60,11 +35,11 @@ bool startsWith(char text[], char sub[]) {
 
 void BPUcompile(char* filename) {
 	//Instructions Set
-	char isa[20][4] = {"JMP","ADD","SUB","LSH","RSH","AND","OR","XOR","LDA","STA","CND","PSH","POP","CMP","ICP","STK","RPA","RPR","WPA","WPR"};
+	char isa[ISA_SIZE][4] = {"JMP", "ADD", "SUB", "LSH", "RSH", "AND", "OR", "XOR", "LDA", "STA", "CND", "PSH", "POP", "CMP", "ICP", "STK", "RPA", "RPR", "WPA", "WPR"};
 	//File being read
 	FILE *fptr;
 	//Line being read
-	char line[128];
+	char line[MAX_LINE_LENGTH];
 	
 	//Set Global Variables
 	instruction = 0;
@@ -73,9 +48,8 @@ void BPUcompile(char* filename) {
 	fptr = fopen(filename, "r");
 	
 	//Reads requested file
-	while(fgets(line, 128, fptr)) {
-		int isaSize = sizeof(isa);
-		for(int i = 0; i < isaSize; i++) {
+	while(fgets(line, MAX_LINE_LENGTH, fptr)) {
+		for(int i = 0; i < ISA_SIZE; i++) {
 			if(startsWith(line,isa[i])) {
 				instructions[instruction] = i;
 				instruction++;
