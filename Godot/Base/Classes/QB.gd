@@ -1,4 +1,4 @@
-class_name CompilerQB extends Node
+class_name CompilerQB extends RefCounted
 
 ##All characters that occur before an operand that specify what type of operand it is.
 const OPERAND_PREFIX:PackedStringArray = ["$","#"]
@@ -12,19 +12,43 @@ const OP_2:PackedStringArray = [">>","<<"]
 const OP_3:PackedStringArray = ["|","&","^"]
 const OP_4:PackedStringArray = ["+","-"]
 
-const QB_OPERATORS:PackedStringArray = ["+","-",">>","<<","|","&","^"]
-const ASM_OPERATORS:PackedStringArray = ["ADD","SUB","RSH","LSH","OR","AND","XOR"]
+const QB_OPERATORS:PackedStringArray = ["+","-",">>","<<","|","&","^","="]
+const ASM_OPERATORS:PackedStringArray = ["ADD","SUB","RSH","LSH","OR","AND","XOR","STA"]
+
+var code:String
+
+var postproc:Dictionary
+var undefined:PackedByteArray
+
+var assembly:String
+
+func _init(newCode:String) -> void:
+	code = seperateArgs(newCode)
+	define()
+	preproc()
+	for i in (code.count("\n") + 1):
+		assembly += toAssembly(toPostFix(i))
+
+static func compile(newCode:String) -> Assembly:
+	var compiler:CompilerQB = CompilerQB.new(newCode)
+	return Assembly.new(compiler.assembly)
 
 ##Converts an infix expression (as a [String]) to a postfix expression (as a [PackedStringArray]). [br]
 ##An infix expression contains an operator surround by operands such as [code] 2 * 5 + 3 [/code]. [br]
 ##A postfix expression has the operator after the operands such as [code] 2 5 * 3 + [/code].
-static func toPostFix(line:String) -> PackedStringArray:
+func toPostFix(line:int) -> PackedStringArray:
 	var result:PackedStringArray = []
 	var stack:PackedStringArray = []
-	var args:PackedStringArray = line.split(" ",false)
+	var args:PackedStringArray = code.get_slice("\n", line).split(" ",false)
+	
+	var storage:String = ""
+	
 	while args:
 		if NUMBERS.has(args[0].substr(0,1)) || OPERAND_PREFIX.has(args[0].substr(0,1)):
-			result.append(args[0])
+			if args.has("="):
+				storage = args[0]
+			else:
+				result.append(args[0])
 		if OP_1.has(args[0]):
 			stack.append(args[0])
 		if OP_2.has(args[0]):
@@ -57,55 +81,77 @@ static func toPostFix(line:String) -> PackedStringArray:
 				stack.remove_at(stack.size() - 1)
 		args.remove_at(0)
 	while stack.size():
+		if stack[stack.size() - 1] == "=":
+			result.append(storage)
 		result.append(stack[stack.size() - 1])
 		stack.remove_at(stack.size() - 1)
 	return result
 
-static func toAssembly(postfix:PackedStringArray) -> String:
+func toAssembly(postfix:PackedStringArray) -> String:
 	var result:String = ""
 	var stack:PackedStringArray = []
 	for i in postfix:
+		i = i.replace("\n", "")
 		if OPERAND_PREFIX.has(i.substr(0,1)) || NUMBERS.has(i.substr(0,1)):
+			if NUMBERS.has(i.substr(0,1)):
+				i = "#" + i
 			stack.append(i)
 		elif QB_OPERATORS.has(i):
-			result += ASM_OPERATORS[QB_OPERATORS.find(i)] + stack[stack.size() - 1] + ";\n"
-			stack.remove_at(stack.size() - 1)
+			if stack[stack.size() - 2] != "$XX":
+				if stack.has("$XX"):
+					stack[stack.find("$XX")] = "$" + String.num_int64(undefined[undefined.size() - 1])
+					#CRITICAL: Memory Leak
+					result += "STA " + "$" + String.num_int64(undefined[undefined.size() - 1]) + ";\n"
+					undefined.remove_at(undefined.size() - 1)
+				if stack[stack.size() - 2].begins_with("$"):
+					result += "LDA " + stack[stack.size() - 2] + ";\n"
+				else:
+					result += "LDI " + stack[stack.size() - 2] + ";\n"
+				stack.remove_at(stack.size() - 2)
+			result += ASM_OPERATORS[QB_OPERATORS.find(i)] + " " + stack[stack.size() - 1] + ";\n"
+			stack[stack.size() - 1] = "$XX"
 	return result
 
-func preproc(code:String):
-	var postproc:Dictionary
-	var undefined:PackedByteArray
-	var result:String
+func seperateArgs(text:String) -> String:
+	text = text.replace(";", "\n")
+	text = text.replace("*", " * ")
+	text = text.replace("/", " / ")
+	text = text.replace("+", " + ")
+	text = text.replace("-", " - ")
+	text = text.replace("(", " ( ")
+	text = text.replace(")", " ) ")
+	text = text.replace("[", " [ ")
+	text = text.replace("]", " ] ")
+	text = text.replace("<", " < ")
+	text = text.replace(">", " > ")
+	text = text.replace("!", " ! ")
+	text = text.replace("^", " ^ ")
+	text = text.replace("&", " & ")
+	text = text.replace("|", " | ")
+	text = text.replace("& &", "&&")
+	text = text.replace("| |", "||")
+	text = text.replace("<  <", "<<")
+	text = text.replace(">  >", ">>")
+	text = text.replace("  ", " ")
+	return text
+
+func define() -> void:
+	code = seperateArgs(code)
 	#Clear all definitions
-	code = code.replace(";", "\n")
-	code = code.replace("*", " * ")
-	code = code.replace("/", " / ")
-	code = code.replace("+", " + ")
-	code = code.replace("-", " - ")
-	code = code.replace("(", " ( ")
-	code = code.replace(")", " ) ")
-	code = code.replace("[", " [ ")
-	code = code.replace("]", " ] ")
-	code = code.replace("<", " < ")
-	code = code.replace(">", " > ")
-	code = code.replace("!", " ! ")
-	code = code.replace("^", " ^ ")
-	code = code.replace("&", " & ")
-	code = code.replace("|", " | ")
-	code = code.replace("& &", "&&")
-	code = code.replace("| |", "||")
-	code = code.replace("< <", "<<")
-	code = code.replace("> >", ">>")
 	postproc = {}
 	undefined.resize(256)
-	result = ""
 	for i in 256:
 		undefined[i] = i
 	#Define Variables
 	for i in code.split("\n",false):
 		if i.contains(" ") && VAR_TYPES.has(i.split(" ")[0]) && undefined.size():
-			postproc[i.get_slice(" ", 1)] = undefined[0]
+			postproc[i.get_slice(" ", 1)] = "$" + String.num_int64(undefined[0])
 			undefined.remove_at(0)
+
+func preproc() -> void:
+	#Initialize Result and Defintions
+	var result:String = ""
+	#Replace tokens with their definitions
 	for line in code.split("\n", false):
 		for arg in line.split(" ", false):
 			if postproc.keys().has(arg):
@@ -114,4 +160,4 @@ func preproc(code:String):
 				result += arg
 			result += " "
 		result += "\n"
-	result = result.replace(" \n","\n")
+	code = result.replace(" \n","\n")
