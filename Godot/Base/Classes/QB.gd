@@ -19,6 +19,7 @@ var code:String
 
 var postproc:Dictionary
 var undefined:PackedByteArray
+var temp:PackedByteArray
 
 var assembly:String
 
@@ -50,19 +51,22 @@ func toPostFix(line:int) -> PackedStringArray:
 			else:
 				result.append(args[0])
 		if OP_1.has(args[0]):
-			stack.append(args[0])
-		if OP_2.has(args[0]):
 			while stack.size() && OP_1.has(stack[stack.size() - 1]):
 				result.append(stack[stack.size() - 1])
 				stack.remove_at(stack.size() - 1)
 			stack.append(args[0])
-		if OP_3.has(args[0]):
+		if OP_2.has(args[0]):
 			while stack.size() && (OP_1.has(stack[stack.size() - 1]) || OP_2.has(stack[stack.size() - 1])):
 				result.append(stack[stack.size() - 1])
 				stack.remove_at(stack.size() - 1)
 			stack.append(args[0])
-		if OP_4.has(args[0]):
+		if OP_3.has(args[0]):
 			while stack.size() && (OP_1.has(stack[stack.size() - 1]) || OP_2.has(stack[stack.size() - 1]) || OP_3.has(stack[stack.size() - 1])):
+				result.append(stack[stack.size() - 1])
+				stack.remove_at(stack.size() - 1)
+			stack.append(args[0])
+		if OP_4.has(args[0]):
+			while stack.size() && (OP_1.has(stack[stack.size() - 1]) || OP_2.has(stack[stack.size() - 1]) || OP_3.has(stack[stack.size() - 1]) || OP_4.has(stack[stack.size() - 1])):
 				result.append(stack[stack.size() - 1])
 				stack.remove_at(stack.size() - 1)
 			stack.append(args[0])
@@ -98,9 +102,12 @@ func toAssembly(postfix:PackedStringArray) -> String:
 			stack.append(i)
 		elif QB_OPERATORS.has(i):
 			if stack[stack.size() - 2] != "$XX":
+				for reg in temp:
+					if !stack.has("$"+str(reg)):
+						undefined.append(reg)
 				if stack.has("$XX"):
 					stack[stack.find("$XX")] = "$" + String.num_int64(undefined[undefined.size() - 1])
-					#CRITICAL: Memory Leak
+					temp.append(undefined[undefined.size() - 1])
 					result += "STA " + "$" + String.num_int64(undefined[undefined.size() - 1]) + ";\n"
 					undefined.remove_at(undefined.size() - 1)
 				if stack[stack.size() - 2].begins_with("$"):
