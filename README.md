@@ -47,3 +47,4 @@ The Assembler:
 * Can display processed assembly when pressing `alt`
 
 # C
+Mostly an experiment, definitely not ready yet.
