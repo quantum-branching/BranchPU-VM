@@ -7,7 +7,7 @@ var dly:int = 0
 const PORT:int = 1
 
 func _process(_delta: float) -> void:
-	output = p26(input)
+	pass #output = p26(input)
 
 func p26(op:int) -> int:
 	if !(op >> 5):
@@ -25,3 +25,9 @@ func p26(op:int) -> int:
 		dly = op & 31
 		return PORT
 	return PORT
+
+func reset():
+	input = 0
+	for x in 32:
+		for y in 32:
+			set_cell(Vector2i(x, y), 8, Vector2i(1, 0))

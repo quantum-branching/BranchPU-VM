@@ -16,7 +16,9 @@ var stack:PackedInt32Array = []
 
 ##An intermediate container for values being calculated
 ##Almost all calculations change this value
-var accumulator:int = 0
+var accumulator:int = 0:
+	set(x):
+		accumulator = x & 0xFF
 
 var memory:PackedByteArray = []
 

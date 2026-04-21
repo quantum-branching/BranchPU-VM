@@ -1,0 +1,9 @@
+#define true 1
+#define false 0
+
+#define GT 1
+#define EQ 2
+#define GTE 3
+#define LTE 5
+#define NE 6
+#define LT 7

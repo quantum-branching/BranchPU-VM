@@ -1,0 +1,70 @@
+[gd_scene format=3 uid="uid://cvmngaepeenwe"]
+
+[ext_resource type="Texture2D" uid="uid://bt1wxh2o1vjsy" path="res://Base/Assets/Icon.png" id="1_52bhu"]
+[ext_resource type="Texture2D" uid="uid://bch3wnnc00m5v" path="res://Base/Assets/Play.png" id="2_upmy7"]
+
+[sub_resource type="GDScript" id="GDScript_gx2gx"]
+resource_name = "Main"
+script/source = "extends ColorRect
+
+func _ready():
+	for i in OS.get_cmdline_args():
+		if i.ends_with(\".bpu\"):
+			get_tree().change_scene_to_file(\"res://Lang-ASM/ASM.tscn\")
+		if i.ends_with(\".qb\"):
+			get_tree().change_scene_to_file(\"res://Lang-QB/QB.tscn\")
+"
+
+[sub_resource type="GDScript" id="GDScript_52bhu"]
+resource_name = "ASM"
+script/source = "extends TextureButton
+
+
+# Called when the node enters the scene tree for the first time.
+func _pressed() -> void:
+	get_tree().change_scene_to_file(\"res://Lang-ASM/ASM.tscn\")
+"
+
+[sub_resource type="GDScript" id="GDScript_upmy7"]
+resource_name = "QB"
+script/source = "extends TextureButton
+
+
+# Called when the node enters the scene tree for the first time.
+func _pressed() -> void:
+	get_tree().change_scene_to_file(\"res://Lang-QB/QB.tscn\")
+"
+
+[node name="Node2D" type="Node2D" unique_id=1265714023]
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1822265270]
+offset_right = 1152.0
+offset_bottom = 648.0
+color = Color(0.012617188, 0.012617188, 0.012617188, 1)
+script = SubResource("GDScript_gx2gx")
+
+[node name="ASM" type="TextureButton" parent="." unique_id=279429860]
+offset_left = 64.0
+offset_top = 98.0
+offset_right = 128.0
+offset_bottom = 162.0
+scale = Vector2(7, 7)
+texture_normal = ExtResource("1_52bhu")
+texture_pressed = ExtResource("1_52bhu")
+texture_hover = ExtResource("1_52bhu")
+texture_disabled = ExtResource("1_52bhu")
+texture_focused = ExtResource("1_52bhu")
+script = SubResource("GDScript_52bhu")
+
+[node name="QB" type="TextureButton" parent="." unique_id=1640932950]
+offset_left = 636.0
+offset_top = 98.0
+offset_right = 764.0
+offset_bottom = 226.0
+scale = Vector2(3.5, 3.5)
+texture_normal = ExtResource("2_upmy7")
+texture_pressed = ExtResource("2_upmy7")
+texture_hover = ExtResource("2_upmy7")
+texture_disabled = ExtResource("2_upmy7")
+texture_focused = ExtResource("2_upmy7")
+script = SubResource("GDScript_upmy7")
