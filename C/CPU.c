@@ -3,77 +3,15 @@
 #include <stdint.h>
 #include <time.h>
 
+#include "OS/Windows.c" //Includes platform-specific system commands, please change when compiling for a different platform
+
 #include "Types/Stack.c"
 #include "Types/Bool.c"
 #include "IO/Port.c"
 #include "IO/GPU.c"
 
-#define CLEAR_SCREEN "cls"
-
-///Maximum binary size, 4096 B (4 KB) for 2048 instructions (2 B each)
-#define BINARY_SIZE 4096
-///Total number of registers, 256 for 8-bit register addressing
-#define REGISTERS_SIZE 256
-///Total number of ports, 8 for 3-bit port addressing
-#define PORTS_SIZE 8
-
-///The maximum value the program counter can reach
-#define INSTRUCTION_LIMIT 4095
-///The distance the CPU must step for a new instruction
-#define INSTRUCTION_STEP 2
-///The effect of the 3-bit modifier when added to the 8-bit operand (for an 11-bit value)
-#define MOD_OFFSET 8
-///The offset of the instruction opcode from the lowest bit of the a given instruction byte
-#define INSTRUCTION_OFFSET 3
-///The mask for the 5-bit opcode in the instruction
-#define INSTRUCTION_MASK 31
-///The mask for the 3-bit modifier in the instruction
-#define MOD_MASK 7
-///Offset from the instruction for which the data lies
-#define DATA_OFFSET 1
-///Limits the range for which a byte can be in
-#define BYTE_MASK 255
-
-///Jumps to an 11-bit address using the modifier as the high bits and the operand as the low bits
-#define JMP 0
-///Sets the accumulator to the sum of the accumulator and a value
-#define ADD 1
-///Sets the accumulator to the difference of the accumulator and a value
-#define SUB 2
-///Left shifts the accumulator by a value
-#define LSH 3
-///Right shifts the accumulator by a value
-#define RSH 4
-///Sets the accumulator to the bitwise AND of the accumulator and a value
-#define AND 5
-///Sets the accumulator to the bitwise OR of the accumulator and a value
-#define OR  6
-///Sets the accumulator to the bitwise XOR of the accumulator and a value
-#define XOR 7
-///Load Accumulator from Register
-#define LDA 8
-///Store Accumulator to Register
-#define STA 9
-///Conditional Jump
-#define CND 10
-///Push to Program Counter Stack
-#define PSH 11
-///Pop from Program Counter Stack
-#define POP 12
-///Compare Accumulator with Register to Condition Flag
-#define CMP 13
-///Immediate Comparison
-#define ICP 14
-///Value Stack
-#define STK 15
-///Read Port to Accumulator
-#define RPA 16
-///Read Port to Register
-#define RPR 17
-///Write Port from Accumulator
-#define WPA 18
-///Write Port from Register
-#define WPR 19
+#include "Data/ISA.c"
+#include "Data/Encoding.c"
 
 /// The binary program loaded into the CPU, which can hold up to 4096 bytes of instructions and data
 uint8_t binary[BINARY_SIZE];
@@ -82,10 +20,10 @@ uint8_t binary[BINARY_SIZE];
 int programCounter;
 
 /// The state of the CPU's registers, which can hold any value from 0 to 255
-int registers[REGISTERS_SIZE];
+uint32_t registers[REGISTERS_SIZE];
 
 /// The accumulator, which can hold any value from 0 to 255
-int accumulator;
+uint32_t accumulator;
 
 /// The condition flag, which can hold either 0 or 1
 int conditionFlag;
@@ -121,21 +59,15 @@ void init() {
 
 /// @brief Executes a given number of cycles of the loaded binary
 /// @param cycles The number of cycles to execute
-void exec(int cycles) {
-	#define IMMEDIATE_FLAG 1
-	#define CMP_LT_FLAG 1
-	#define CMP_EQ_FLAG 2
-	#define CMP_NOT_FLAG 4
-	#define STK_POP_FLAG 2
-
-	#define JUMP (INSTRUCTION_STEP * ((mod << MOD_OFFSET) | data) - INSTRUCTION_STEP) & INSTRUCTION_LIMIT
+void exec(const int cycles) {
+	#define JUMP (INSTRUCTION_STEP * (((mod) << MOD_OFFSET) | (data)) - INSTRUCTION_STEP) & BINARY_MASK
 	#define CURRENT_PORT ports[mod & MOD_MASK]
 
-	/// Sets the accumulator to a value, ensuring that it stays within the bounds of a byte
-	#define accum(value) accumulator = (value) & BYTE_MASK
+	/// Masks the value to be within 0 - 255, ensuring that it stays within the bounds of a byte
+	#define mask(value) ((value) & BYTE_MASK)
 
 	/// Sets either the accumulator or a register to a value, depending on the state of the immediate flag in the modifier
-	#define set(value) if(mod & IMMEDIATE_FLAG) { accumulator = (value) & BYTE_MASK; } else { registers[data] = (value) & BYTE_MASK; }
+	#define set(value) if(mod & IMMEDIATE_FLAG) { accumulator = mask(value); } else { registers[data] = mask(value); }
 
 	int mod;
 	int opcode;
@@ -159,28 +91,28 @@ void exec(int cycles) {
 				programCounter = JUMP;
 				break;
 			case ADD:
-				accum(accumulator + regData);
+				accumulator = mask(accumulator + regData);
 				break;
 			case SUB:
-				accum(accumulator - regData);
+				accumulator = mask(accumulator - regData);
 				break;
 			case LSH:
-				accum(accumulator << regData);
+				accumulator = mask(accumulator << regData);
 				break;
 			case RSH:
-				accum(accumulator >> regData);
+				accumulator = (accumulator >> regData);
 				break;
 			case AND:
-				accum(accumulator & regData);
+				accumulator = (accumulator & regData);
 				break;
 			case OR:
-				accum(accumulator | regData);
+				accumulator = (accumulator | regData);
 				break;
 			case XOR:
-				accum(accumulator ^ regData);
+				accumulator = (accumulator ^ regData);
 				break;
 			case LDA:
-				accum(regData);
+				accumulator = regData;
 				break;
 			case STA:
 				registers[data] = accumulator;
@@ -195,11 +127,11 @@ void exec(int cycles) {
 				programCounter = JUMP;
 				break;
 			case POP:
-				programCounter = pop(&jmpStack) & INSTRUCTION_LIMIT;
+				programCounter = pop(&jmpStack) & BINARY_MASK;
 				break;
 			case CMP:
 				conditionFlag = (mod & CMP_NOT_FLAG) && 1;
-				if(((CMP_LT_FLAG & mod) && accumulator < regData) || ((CMP_LT_FLAG & mod) && accumulator == regData)) {
+				if(((CMP_LT_FLAG & mod) && accumulator < regData) || ((CMP_EQ_FLAG & mod) && accumulator == regData)) {
 					invert(conditionFlag);
 				}
 				break;
@@ -217,10 +149,10 @@ void exec(int cycles) {
 				}
 				break;
 			case RPA:
-				accum(ports[mod & MOD_MASK].output);
+				accumulator = mask(ports[mask(mod)].output);
 				break;
 			case RPR:
-				registers[data] = ports[mod & MOD_MASK].output;
+				registers[data] = ports[mask(mod)].output;
 				break;
 			case WPA:
 				handlePort(CURRENT_PORT, accumulator);
@@ -248,17 +180,15 @@ void printState() {
 /// @brief Prints the current state of the screen, which is stored in port 1
 void printScreen() {
 	system(CLEAR_SCREEN);
-	for (int y = 0; y < 32; y++) {
-		for (int x = 0; x < 32; x++) {
-			printf("%c ", getPixel(x, y) ? '#' : ' ');
-		}
-		printf("\n");
-	}
+	char result[SCREEN_HEIGHT * (SCREEN_WIDTH * 2)];
+	result[sizeof(result) - 1] = '\0';
+	printf("%s", getScreen(result));
+	printf("\n");
 }
 
 /// @brief Reads the entire file and set the binary to the contents of the file, which should be a compiled BPU program
 /// @param filename The file being read, which should be a compiled BPU program
-void readFile(char *filename) {
+void readBinary(const char *filename) {
 	FILE *file = fopen(filename, "rb");
 	if (file) {
 		fread(binary, 1, BINARY_SIZE, file);
@@ -269,14 +199,32 @@ void readFile(char *filename) {
 	
 }
 
+void speedTest() {
+	clock_t start = clock();
+	#define CYCLES 500000000
+	exec(CYCLES);
+	printf("%d Hz\n", CLOCKS_PER_SEC * ((long) CYCLES / (clock() - start)));
+}
+
 int main(int argc, char *argv[]) {
 	init();
-	readFile(argv[1]);
+	for(int i = 1; i < argc; i++) {
+		if(argv[i][0] != '-') {
+			readBinary(argv[i]);
+		} else {
+			switch (argv[i][1]) {
+				case 's':
+					speedTest();
+					return 0;
+				default:
+					printf("Unknown flag: %s\n", argv[i]);
+			}
+		}
+	}
 
 	while(TRUE) {
 		exec(60);
 		printScreen();
 	}
-
 	return 0;
 }
