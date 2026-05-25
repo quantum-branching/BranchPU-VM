@@ -66,7 +66,7 @@ Compile from Source (Any platform)
   * Windows users should have `#include "OS/Windows.c"`
   * Linux users should have `#include "OS/Linux.c"`
   * Other Unix users should have `#include "OS/Linux.c"`
-* Compile with `<compiler> CPU.c -O3 -s -o <output>`
+* Compile with `<compiler> C/CPU.c -O3 -s -o <output>`
 
 ### Opening Files
 You can open a BPUX file in the BPU VM by passing that file as an argument
