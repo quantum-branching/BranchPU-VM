@@ -1,4 +1,5 @@
-#define TRUE 1
-#define FALSE 0
+#include "Bool.h"
 
-#define invert(x) x ^= TRUE
+int flag(int value, int boolean, int bit) {
+    value = value & ~(1 << bit) | (boolean << bit);
+}
