@@ -129,5 +129,7 @@ func exec(cycles:int):
 			19:
 				ports[mod].input = regData
 				ports[mod].p26(regData)
+			20:
+				valStack.get(valStack.size() - (regData + 1))
 		
 		instruction = (instruction + INSTRUCTION_STEP) & INSTRUCTION_LIMIT
