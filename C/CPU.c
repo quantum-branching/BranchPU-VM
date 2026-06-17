@@ -3,12 +3,12 @@
 #include <stdint.h>
 #include <time.h>
 
-#include "OS/Windows.c" //Includes platform-specific system commands, please change when compiling for a different platform
+#include "OS/Windows.h" //Includes platform-specific system commands, please change when compiling for a different platform
 
-#include "Types/Stack.c"
-#include "Types/Bool.c"
-#include "IO/Port.c"
-#include "IO/GPU.c"
+#include "Types/Stack.h"
+#include "Types/Bool.h"
+#include "IO/Port.h"
+#include "IO/GPU.h"
 
 #include "Data/ISA.c"
 #include "Data/Encoding.c"
@@ -49,12 +49,13 @@ void init() {
 		registers[i] = 0;
 	}
 
+
 	for (int i = 0; i < PORTS_SIZE; i++) {
 		ports[i].input = 0;
 		ports[i].output = 0;
 	}
 
-	ports[1].func = GPU_p26;
+	ports[1].update = GPU_p26;
 }
 
 /// @brief Executes a given number of cycles of the loaded binary
@@ -223,8 +224,10 @@ int main(int argc, char *argv[]) {
 	}
 
 	while(TRUE) {
-		exec(60);
+		exec(240);
+		Sleep(5);
 		printScreen();
 	}
+
 	return 0;
 }
