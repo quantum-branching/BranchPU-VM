@@ -3,12 +3,12 @@
 #include <stdint.h>
 #include <time.h>
 
-#include "OS/Windows.h" //Includes platform-specific system commands, please change when compiling for a different platform
+#include "OS/OS.h" //Includes platform-specific system commands
 
-#include "Types/Stack.h"
-#include "Types/Bool.h"
-#include "IO/Port.h"
-#include "IO/GPU.h"
+#include "Types/Stack.c"
+#include "Types/Bool.c"
+#include "IO/Port.c"
+#include "IO/GPU.c"
 
 #include "Data/ISA.c"
 #include "Data/Encoding.c"
@@ -124,11 +124,11 @@ void exec(const int cycles) {
 				}
 				break;
 			case PSH:
-				push(&jmpStack, programCounter);
+				stack_push(&jmpStack, programCounter);
 				programCounter = JUMP;
 				break;
 			case POP:
-				programCounter = pop(&jmpStack) & BINARY_MASK;
+				programCounter = stack_pop(&jmpStack) & BINARY_MASK;
 				break;
 			case CMP:
 				conditionFlag = (mod & CMP_NOT_FLAG) && 1;
@@ -144,9 +144,9 @@ void exec(const int cycles) {
 				break;
 			case STK:
 				if (mod & STK_POP_FLAG) {
-					set(pop(&valStack));
+					set(stack_pop(&valStack));
 				} else {
-					push(&valStack, regData);
+					stack_push(&valStack, regData);
 				}
 				break;
 			case RPA:
@@ -156,10 +156,10 @@ void exec(const int cycles) {
 				registers[data] = ports[mask(mod)].output;
 				break;
 			case WPA:
-				handlePort(CURRENT_PORT, accumulator);
+				port_handlePort(CURRENT_PORT, accumulator);
 				break;
 			case WPR:
-				handlePort(CURRENT_PORT, regData);
+				port_handlePort(CURRENT_PORT, regData);
 				break;
 		}
 
@@ -170,7 +170,7 @@ void exec(const int cycles) {
 
 /// @brief Prints the program counter, accumulator, and all registers in a readable format
 void printState() {
-	system(CLEAR_SCREEN);
+	clear_screen();
 	printf("PC: %d\n", programCounter / INSTRUCTION_STEP);
 	printf("ACC: %d\n", accumulator);
 	for (int i = 0; i < REGISTERS_SIZE; i++) {
@@ -180,10 +180,10 @@ void printState() {
 
 /// @brief Prints the current state of the screen, which is stored in port 1
 void printScreen() {
-	system(CLEAR_SCREEN);
+	clear_screen();
 	char result[SCREEN_HEIGHT * (SCREEN_WIDTH * 2)];
 	result[sizeof(result) - 1] = '\0';
-	printf("%s", getScreen(result));
+	printf("%s", GPU_getScreen(result));
 	printf("\n");
 }
 
@@ -225,7 +225,7 @@ int main(int argc, char *argv[]) {
 
 	while(TRUE) {
 		exec(240);
-		Sleep(5);
+		sleepms(5);
 		printScreen();
 	}
 
