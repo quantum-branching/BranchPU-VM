@@ -12,13 +12,13 @@ struct Stack
 /// Pushes a value onto the stack
 /// @param stack The stack to push the value onto
 /// @param value The value to push onto the stack
-void push(struct Stack *stack, const int value);
+void stack_push(struct Stack *stack, const int value);
 
 /// Pops the value off the stack and returns it
 /// @param stack The stack to pop the value from
 /// @return The last value pushed onto the stack, or 0 if the 
 /// stack is empty
-int pop(struct Stack *stack);
+int stack_pop(struct Stack *stack);
 
 /// Peeks at the value at a certain offset from the top of the 
 ///stack without modifying the stack
@@ -27,4 +27,4 @@ int pop(struct Stack *stack);
 /// at, where 0 is the top of the stack
 /// @return The value at the specified offset from the top of 
 /// the stack, or 0 if the offset is out of bounds
-int peek(const struct Stack *stack, const int offset);
+int stack_peek(const struct Stack *stack, const int offset);

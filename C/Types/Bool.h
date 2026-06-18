@@ -9,4 +9,4 @@
 /// @param boolean Value of the flag
 /// @param bit Position of the flag
 /// @return The new value with the flag changed
-int flag(int value, int boolean, int bit);
+int bool_flag(int value, int boolean, int bit);
