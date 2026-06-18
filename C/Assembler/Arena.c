@@ -34,6 +34,13 @@ void *arena_allocate(struct Arena *arena, int size) {
 	return ptr;
 }
 
+void arena_empty(struct Arena *arena) {
+	void *base = arena->ptr;
+	for(int i = 0; i < arena->size; i++) {
+		*((char*)base + i) = 0;
+	}
+}
+
 void arena_free(struct Arena *arena) {
 	if(arena->next != NULL) {
 		arena_free(arena->next);
