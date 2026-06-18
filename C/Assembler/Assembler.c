@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "Token.c"
+#include "Preprocessor.c"
 
 #define ASSEMBLY_SIZE 32768
 
@@ -16,28 +16,39 @@ void readAssembly(const char *filename) {
 	
 }
 
-void parseLine(struct token *line) {
-	line->token = dstring_remove(line->token, '\t');
-	struct token *tokens = token_tokenize(line->token, ' ');
+struct token *removeComments(struct token *lines) {
+	if(lines == NULL) {
+		return NULL;
+	}
 
-	printf("%s\n", line->token->string);
+	struct dstring *contents = lines->token;
+	struct dstring *left = DSTRING_EMPTY;
+	struct dstring *right = DSTRING_EMPTY;
 
-	token_free(tokens);
+	dstring_split(contents, ';', left, right);
+
+	lines->token = dstring_tolower(left);
+	lines->next = removeComments(lines->next);
+	return lines;
 }
 
 int assemble(const char *filename) {
+	enterArena(ASSEMBLY_SIZE);
+
 	readAssembly(filename);
 	struct dstring *string = dstring_new(assembly);
-	struct token *token = token_tokenize(string, '\n');
+	string = dstring_remove(string, '\t');
+	string = dstring_remove(string, '\r');
+	struct token *lines = token_tokenize(string, '\n');
 
-	token_each(token, parseLine);
-	
-	token_free(token);
-	dstring_free(string);
+	lines = removeComments(lines);
+	parseDirective(lines, lines);
+
+	exitArena();
 	return 0;
 }
 
 int main(int argc, char *argv[]) {
-    assemble(argv[1]);
+	assemble(argv[1]);
 	return 0;
 }

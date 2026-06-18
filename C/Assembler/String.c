@@ -1,12 +1,29 @@
 #include "String.h"
 
-struct dstring *dstring_copy(struct dstring *dstring) {
+struct dstring *dstring_copy(const struct dstring *dstring) {
 	return dstring_new(dstring->string);
 }
 
 void dstring_free(struct dstring *dstring) {
 	free(dstring->string);
 	free(dstring);
+}
+
+struct dstring *dstring_join(struct dstring *first, const struct dstring *second) {
+	struct dstring *result;
+	char *contents;
+	
+	int length = first->length + second->length;
+	contents = malloc(length + 1);
+
+	contents = strcpy(contents, first->string);
+	contents = strcat(contents, second->string);
+	contents[length] = '\0';
+	
+	result = malloc(sizeof(struct dstring));
+	result->string = contents;
+	result->length = length;
+	return result;
 }
 
 struct dstring *dstring_new(const char *string) {
@@ -80,7 +97,16 @@ void dstring_split(const struct dstring *dstring, const char delimiter, struct d
 	left->string[length] = '\0';
 	left->length = length;
 
-	right->string = realloc(right->string, 1);
-	right->string[0] = '\0';
-	right->length = 0;
+	if(right != NULL) {
+		right->string = realloc(right->string, 1);
+		right->string[0] = '\0';
+		right->length = 0;
+	}
+}
+
+struct dstring *dstring_tolower(struct dstring *dstring) {
+	for(int i = 0; i < dstring->length; i++) {
+		dstring->string[i] = tolower(dstring->string[i]);
+	}
+	return dstring;
 }

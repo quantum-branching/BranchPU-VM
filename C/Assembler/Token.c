@@ -1,5 +1,19 @@
 #include "Token.h"
 
+struct token *token_contentReplace(struct token *token, const struct dstring *old, const struct dstring *new) {
+    if(token == NULL) {
+        return NULL;
+    }
+
+    if(strcmp(token->token->string, old->string)) {
+        dstring_free(token->token);
+        token->token = dstring_copy(new);
+    }
+    
+    token->next = token_contentReplace(token->next, old, new);
+    return token;
+}
+
 void token_each(struct token *token, void (*func)(struct token *)) {
     if (token == NULL) {
         return;
@@ -10,12 +24,18 @@ void token_each(struct token *token, void (*func)(struct token *)) {
 }
 
 struct token *token_filter(struct token *token, int (*filter)(struct token *)) {
-    if(filter(token)) {
+    if(token == NULL) {
+        return NULL;
+    }
+	
+	if(filter(token)) {
         token->next = token_filter(token->next, filter);
         return token;
-    } else {
-        return token_filter(token->next, filter);
     }
+
+	struct token *next = token_filter(token->next, filter);
+	free(token);
+	return next;
 }
 
 void token_free(struct token *token) {
@@ -42,4 +62,8 @@ struct token *token_tokenize(const struct dstring *dstring, char delimiter) {
     token->next = token_tokenize(right, delimiter);
 
     return token;
+}
+
+struct dstring *token_stringify(struct token *token) {
+    return NULL;
 }
