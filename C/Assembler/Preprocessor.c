@@ -49,7 +49,7 @@ struct token *parseDirective(struct token *program, struct token *current) {
 
     switch(enumDirective(line)) {
         case DIR_REMOVEBLANK:
-			// printf("Removing blank lines\n");
+			debug0("Removing blank lines\n");
             program = token_filter(program, isBlank);
         case DIR_DEFINE:
             if(line->next == NULL) {
@@ -57,7 +57,7 @@ struct token *parseDirective(struct token *program, struct token *current) {
 			} else if(line->next->next == NULL) {
 				printf("Can not define %s, #define expects 2 arguments and recieved 1\n", line->next->token->string);
 			} else {
-				// printf("Defining %s as %s\n", line->next->token->string, line->next->next->token->string);
+				debug2("Defining %s as %s\n", line->next->token->string, line->next->next->token->string);
 				defined = line->next->token;
 				definition = line->next->next->token;
 				token_each(program, define);

@@ -1,6 +1,8 @@
 #include "Arena.h"
 
+#define debug0(x) //printf(x)
 #define debug(x,y) //printf(x,y)
+#define debug2(x,y,z) //printf(x,y,z)
 
 struct Arena *currentArena;
 
