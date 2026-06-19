@@ -8,10 +8,17 @@
 struct dstring *defined;
 struct dstring *definition;
 
-void define(struct token *line) {
+struct token *define(struct token *line) {
+	if(line == NULL) {
+		return NULL;
+	}
+
 	struct token *tokens = token_tokenize(line->token, ' ');
 	token_replace(tokens, defined, definition);
-	line = tokens_join(tokens);
+	line->token->string = token_join(tokens, ' ');
+	
+	line->next = define(line->next);
+	return line;
 }
 
 void include(struct token *token) {

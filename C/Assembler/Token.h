@@ -27,6 +27,8 @@ struct token *token_filter(struct token *token, int (*filter)(struct token *));
 /// @param token the tokens to free
 void token_free(struct token *token);
 
+struct dstring *token_join(struct token *token, char delimiter);
+
 /// @brief Creates a dynamic string out of a set of tokens
 /// @param token The tokens to stringify
 /// @return The resulting dynamic string

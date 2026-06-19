@@ -3,7 +3,7 @@
 struct dstring *substitute;
 struct dstring *definition;
 
-void define(struct token *token);
+struct token *define(struct token *token);
 
 void include(struct token *token);
 
