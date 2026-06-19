@@ -46,6 +46,28 @@ void token_free(struct token *token) {
     free(token);
 }
 
+struct dstring *token_join(struct token *token, char delimiter) {
+	struct token *current = token;
+	struct dstring result;
+	char *contents;
+	int length = 0;
+
+	while(current != NULL) {
+		length += current->token->length + 1;
+		current = current->next;
+	}
+
+	current = token;
+	contents = malloc(length + 1);
+	contents[0] = '\0';
+	while(current != NULL) {
+		strcat(contents, current->token->string);
+		current = current->next;
+	}
+
+	return dstring_new(contents);
+}
+
 struct token *token_tokenize(const struct dstring *dstring, char delimiter) {
     if (dstring->length == 0) {
         return NULL;

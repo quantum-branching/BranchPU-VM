@@ -10,6 +10,8 @@ struct dstring *definition;
 
 void define(struct token *line) {
 	struct token *tokens = token_tokenize(line->token, ' ');
+	token_replace(tokens, defined, definition);
+	line = tokens_join(tokens);
 }
 
 void include(struct token *token) {
