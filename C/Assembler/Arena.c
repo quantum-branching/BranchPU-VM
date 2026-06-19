@@ -1,8 +1,8 @@
 #include "Arena.h"
 
-#define debug0(x) //printf(x)
-#define debug(x,y) //printf(x,y)
-#define debug2(x,y,z) //printf(x,y,z)
+#define debug0(x) printf(x)
+#define debug(x,y) printf(x,y)
+#define debug2(x,y,z) printf(x,y,z)
 
 struct Arena *currentArena;
 
@@ -48,7 +48,7 @@ void arena_free(struct Arena *arena) {
 		arena_free(arena->next);
 	}
 	"";
-	debug("Freeing %d bytes\n", arena->current);
+	debug2("Freeing %d/%d bytes\n", arena->current, arena->size);
 	free(arena->ptr);
 	free(arena);
 }

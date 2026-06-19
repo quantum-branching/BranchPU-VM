@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "Preprocessor.c"
 
-#define ASSEMBLY_SIZE 32768
+#define ASSEMBLY_SIZE 65536
 
 char assembly[ASSEMBLY_SIZE];
 
@@ -49,6 +49,12 @@ int assemble(const char *filename) {
 }
 
 int main(int argc, char *argv[]) {
-	assemble(argv[1]);
+	clock_t start = clock();
+	
+	for(int i = 0; i < 1; i++) {
+		assemble(argv[1]);
+	}
+
+	printf("%f\n", (float)(clock() - start) / CLOCKS_PER_SEC);
 	return 0;
 }

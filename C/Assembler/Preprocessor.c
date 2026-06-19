@@ -1,6 +1,8 @@
 #include "Arena.c"
 #include "Preprocessor.h"
 
+#include <time.h>
+
 #define DIR_REMOVEBLANK 1
 #define DIR_DEFINE 2
 #define DIR_INCLUDE 3
@@ -8,17 +10,11 @@
 struct dstring *defined;
 struct dstring *definition;
 
-struct token *define(struct token *line) {
-	if(line == NULL) {
-		return NULL;
-	}
-
+void define(struct token *line) {
 	struct token *tokens = token_tokenize(line->token, ' ');
-	token_replace(tokens, defined, definition);
-	line->token->string = token_join(tokens, ' ');
-	
-	line->next = define(line->next);
-	return line;
+	token_contentReplace(tokens, defined, definition);
+
+	line->token = token_join(tokens, ' ');
 }
 
 void include(struct token *token) {
@@ -52,8 +48,7 @@ struct token *parseDirective(struct token *program, struct token *current) {
     if(current == NULL) {
         return program;
     }
-    
-	enterArena(PAGE_SIZE);
+
     struct token *line = token_tokenize(current->token, ' ');
 
     switch(enumDirective(line)) {
@@ -62,7 +57,7 @@ struct token *parseDirective(struct token *program, struct token *current) {
             program = token_filter(program, isBlank);
         case DIR_DEFINE:
             if(line->next == NULL) {
-				printf("#define directive expects 2 arguments and recieved 0\n");
+				//printf("#define directive expects 2 arguments and recieved 0\n");
 			} else if(line->next->next == NULL) {
 				printf("Can not define %s, #define expects 2 arguments and recieved 1\n", line->next->token->string);
 			} else {
@@ -74,7 +69,6 @@ struct token *parseDirective(struct token *program, struct token *current) {
         case DIR_INCLUDE:
             break;
     }
-    
-	exitArena();
+
     return parseDirective(program, current->next);
 }
