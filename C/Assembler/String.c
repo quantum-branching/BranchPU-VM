@@ -1,44 +1,24 @@
+///@brief String.c but requires the caller pass available memory
+
 #include "String.h"
 
-struct dstring *dstring_copy(const struct dstring *dstring) {
-	return dstring_new(dstring->string);
+void dstring_copy(const struct dstring *source, struct dstring *destination) {
+	destination->length = source->length;
+	destination->string = source->string;
 }
 
-void dstring_free(struct dstring *dstring) {
-	free(dstring->string);
-	free(dstring);
+struct dstring dstring(char *string) {
+	return (struct dstring) {string, strlen(string)};
 }
 
-struct dstring *dstring_join(struct dstring *first, const struct dstring *second) {
-	struct dstring *result;
-	char *contents;
-	
-	int length = first->length + second->length;
-	contents = malloc(length + 1);
-
-	contents = strcpy(contents, first->string);
-	contents = strcat(contents, second->string);
-	contents[length] = '\0';
-	
-	result = malloc(sizeof(struct dstring));
-	result->string = contents;
-	result->length = length;
-	return result;
+void dstring_join(const struct dstring *first, const struct dstring *second, struct dstring *result) {
+	strncpy(result->string, first->string, first->length);
+	strncat(result->string, second->string, second->length);
+	result->length = first->length + second->length;
+	result->string[result->length] = '\0';
 }
 
-struct dstring *dstring_new(const char *string) {
-	struct dstring *ptr = malloc(sizeof(struct dstring));
-	char *contents = malloc(strlen(string) + 1);
-
-	strcpy(contents, string);
-
-	ptr->string = contents;
-	ptr->length = strlen(string);
-
-	return ptr;
-}
-
-struct dstring *dstring_remove(struct dstring *dstring, const char c) {
+void dstring_remove(struct dstring *dstring, const char c) {
 	int inString = 0;
 
 	for(int i = 0; i < dstring->length; i++) {
@@ -52,18 +32,24 @@ struct dstring *dstring_remove(struct dstring *dstring, const char c) {
 			i--;
 		}
 	}
-
-	return dstring;
 }
 
-struct dstring *dstring_replace(struct dstring *dstring, const char x, const char y) {
+void dstring_replace(struct dstring *dstring, const char x, const char y) {
+	int inString = 0;
+	
 	for(int i = 0; i < dstring->length; i++) {
-		if(dstring->string[i] == x) {
+		if(dstring->string[i] == '"') {
+			inString = !inString;
+		}
+
+		if(dstring->string[i] == x && !inString) {
 			dstring->string[i] = y;
 		}
 	}
+}
 
-	return dstring;
+int dstring_sizeof(const struct dstring *dstring) {
+	return sizeof(struct dstring) + sizeof(char) * (dstring->length + 1);
 }
 
 void dstring_split(const struct dstring *dstring, const char delimiter, struct dstring *left, struct dstring *right) {
@@ -91,22 +77,10 @@ void dstring_split(const struct dstring *dstring, const char delimiter, struct d
 			return;
 		}
 	}
-
-	left->string = realloc(left->string, length + 1);
-	strncpy(left->string, string, length);
-	left->string[length] = '\0';
-	left->length = length;
-
-	if(right != NULL) {
-		right->string = realloc(right->string, 1);
-		right->string[0] = '\0';
-		right->length = 0;
-	}
 }
 
-struct dstring *dstring_tolower(struct dstring *dstring) {
+void dstring_tolower(struct dstring *dstring) {
 	for(int i = 0; i < dstring->length; i++) {
 		dstring->string[i] = tolower(dstring->string[i]);
 	}
-	return dstring;
 }

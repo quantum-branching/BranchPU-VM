@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include "Preprocessor.c"
-
-#define ASSEMBLY_SIZE 65536
-
-char assembly[ASSEMBLY_SIZE];
+#include "Assembler.h"
 
 void readAssembly(const char *filename) {
 	FILE *file = fopen(filename, "rb");
@@ -22,39 +17,36 @@ struct token *removeComments(struct token *lines) {
 	}
 
 	struct dstring *contents = lines->token;
-	struct dstring *left = DSTRING_EMPTY;
-	struct dstring *right = DSTRING_EMPTY;
+	struct dstring *left;
+	struct dstring *right;
 
 	dstring_split(contents, ';', left, right);
+	dstring_tolower(left);
 
-	lines->token = dstring_tolower(left);
+	lines->token = left;
 	lines->next = removeComments(lines->next);
 	return lines;
 }
 
 int assemble(const char *filename) {
-	enterArena(ASSEMBLY_SIZE);
-
 	readAssembly(filename);
-	struct dstring *string = dstring_new(assembly);
-	string = dstring_remove(string, '\t');
-	string = dstring_remove(string, '\r');
-	struct token *lines = token_tokenize(string, '\n');
+
+	struct dstring string = dstring(assembly);
+	struct token *lines;
+
+	dstring_remove(&string, '\t');
+	dstring_remove(&string, '\r');
+	// token_tokenize(&string, lines,'\n');
+	debug2("token_tokenize(%p, %p, \'\\n\')\n", &string, lines);
 
 	lines = removeComments(lines);
-	parseDirective(lines, lines);
+	debug("removeComments(%p)\n", lines);
+	// parseDirective(lines, lines);
 
-	exitArena();
 	return 0;
 }
 
 int main(int argc, char *argv[]) {
-	clock_t start = clock();
-	
-	for(int i = 0; i < 1; i++) {
-		assemble(argv[1]);
-	}
-
-	printf("%f\n", (float)(clock() - start) / CLOCKS_PER_SEC);
+	assemble(argv[1]);
 	return 0;
 }

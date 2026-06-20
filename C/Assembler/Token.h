@@ -1,9 +1,18 @@
 #include "String.c"
 
+/// @brief A token that contains a dynamic string and optionally another token
+/// @param token The dynamic string
+/// @param next The next token in a linked list of tokens
 struct token {
 	struct dstring *token;
 	struct token *next;
 };
+
+/// @brief Appends a new token to the end of a list of tokens
+/// @param token The list of tokens to append to
+/// @param addition The new token to append
+/// @return The updated list of tokens
+struct token *token_append(struct token *token, struct token *addition);
 
 /// @brief Replaces content in a tokens
 /// @param token Tokens to process
@@ -23,19 +32,14 @@ void token_each(struct token *token, void (*func)(struct token *));
 /// @return The filtered tokens
 struct token *token_filter(struct token *token, int (*filter)(struct token *));
 
-/// @brief Frees this token and all subsequent tokens
-/// @param token the tokens to free
-void token_free(struct token *token);
-
-struct dstring *token_join(struct token *token, char delimiter);
-
-/// @brief Creates a dynamic string out of a set of tokens
-/// @param token The tokens to stringify
-/// @return The resulting dynamic string
-struct dstring *token_stringify(struct token *token);
-
-/// @brief Tokenizes a string using a delimiter
-/// @param dstring The string to tokenize
+/// @brief Joins tokens with a delimiter to create a dynamic string
+/// @param token The tokens to join
+/// @param destination The dynamic string to store the result
 /// @param delimiter The delimiter to use
-/// @return the resulting tokens
-struct token *token_tokenize(const struct dstring *dstring, char delimiter);
+void token_join(struct token *source, char *destination, char delimiter);
+
+/// @brief Tokenizes a dynamic string into a list of tokens
+/// @param source dynamic string to tokenize
+/// @param destination location to store the tokens
+/// @param delimiter character to separate tokens
+void token_tokenize(const struct dstring *source, struct token *destination, const char delimiter);
