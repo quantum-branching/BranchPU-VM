@@ -63,9 +63,9 @@ Compile from Source (Any platform)
   * [LLVM/Clang](https://releases.llvm.org/)
   * [TCC (Tiny C Compiler)](https://github.com/cnlohr/tinycc-win64-installer)
 *  Compile with `<compiler> C/CPU.c <OS File> -O3 -s -o <output>`
-  * Windows users should have `#OS/Windows.c`
-  * Linux users should have `#OS/Linux.c`
-  * Other Unix users should have `#OS/Linux.c`
+  * Windows users should have `OS/Windows.c`
+  * Linux users should have `OS/Linux.c`
+  * Other Unix users should have `OS/Linux.c`
 * Compile with `<compiler> C/CPU.c -O3 -s -o <output>`
 
 ### Opening Files
