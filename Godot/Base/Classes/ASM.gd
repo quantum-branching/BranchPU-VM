@@ -32,7 +32,7 @@ func _init(newCode:String = "", newError:bool = false) -> void:
 			line = line.get_slice(";", 0)
 		if line.begins_with("."):
 			labels[line.get_slice(" ", 0)] = String.num_int64(counter)
-			if line.contains(" "):
+			if line.contains(" ") && line.split(" ", false, 1).size() > 1:
 				line = line.split(" ", false, 1)[1]
 			else:
 				line = ""
