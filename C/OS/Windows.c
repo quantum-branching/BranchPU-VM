@@ -3,12 +3,9 @@
 /// which include clearing the screen and printing the screen
 
 #include <Windows.h>
-#include "OS.h"
 
 void clear_screen() {
 	system("cls");
 }
 
-void sleepms(int ms) {
-    Sleep(ms);
-}
+#define sleepms(x) Sleep(x)

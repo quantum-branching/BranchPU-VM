@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <time.h>
 
-#include "OS/OS.h" //Includes platform-specific system commands
+#include "OS/OS.c" //Includes platform-specific system commands
 
 #include "Types/Stack.c"
 #include "Types/Bool.c"
@@ -80,10 +80,11 @@ void exec(const int cycles) {
 		opcode = (binary[programCounter] >> INSTRUCTION_OFFSET) & INSTRUCTION_MASK;
 		data = binary[programCounter + DATA_OFFSET] & BYTE_MASK;
 		mod = binary[programCounter] & MOD_MASK;
-		if (!(mod & IMMEDIATE_FLAG) || opcode == CMP || opcode == WPR) {
-			regData = registers[data];
-		} else {
+		
+		if (mod & IMMEDIATE_FLAG) {
 			regData = data;
+		} else {
+			regData = registers[data];
 		}
 
 		//Performs the instruciton
@@ -131,6 +132,7 @@ void exec(const int cycles) {
 				programCounter = stack_pop(&jmpStack) & BINARY_MASK;
 				break;
 			case CMP:
+				regData = registers[data];
 				conditionFlag = (mod & CMP_NOT_FLAG) && 1;
 				if(((CMP_LT_FLAG & mod) && accumulator < regData) || ((CMP_EQ_FLAG & mod) && accumulator == regData)) {
 					invert(conditionFlag);
@@ -159,6 +161,7 @@ void exec(const int cycles) {
 				port_handlePort(CURRENT_PORT, accumulator);
 				break;
 			case WPR:
+				regData = registers[data];
 				port_handlePort(CURRENT_PORT, regData);
 				break;
 		}
@@ -204,7 +207,8 @@ void speedTest() {
 	clock_t start = clock();
 	#define CYCLES 500000000
 	exec(CYCLES);
-	printf("%d Hz\n", CLOCKS_PER_SEC * ((long) CYCLES / (clock() - start)));
+	double time = clock() - start;
+	printf("%f Hz\n", CLOCKS_PER_SEC * (CYCLES / time));
 }
 
 int main(int argc, char *argv[]) {

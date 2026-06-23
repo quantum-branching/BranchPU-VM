@@ -7,3 +7,9 @@
 void clear_screen();
 
 void sleepms(int ms);
+
+#if defined(_WIN32) || defined(_WIN64)
+	#include "Windows.c"
+#else
+	#include "Linux.c"
+#endif

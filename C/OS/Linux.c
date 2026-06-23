@@ -3,7 +3,6 @@
 /// include clearing the screen and printing the screen
 
 #include <time.h>
-#include "OS.h"
 
 void clear_screen() {
 	system("clear");

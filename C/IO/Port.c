@@ -1,16 +1,8 @@
-struct Port {
-    int input;
-    int output;
+#include "Port.h"
 
-    int (*func)(int);
-};
-
-/// @brief Determines the output of a port based on its input
-/// @param port The port to handle
-/// @param input The input value for the port
-void handlePort(struct Port port, const int input) {
+inline void port_handlePort(struct Port port, const int input) {
 	port.input = input;
-    if (port.func) {
-		port.output = port.func(port.input);
+    if (port.update) {
+		port.output = port.update(port.input);
 	}
 }
