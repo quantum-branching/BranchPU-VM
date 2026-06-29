@@ -1,17 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <time.h>
-
-#include "OS/OS.c" //Includes platform-specific system commands
-
-#include "Types/Stack.c"
-#include "Types/Bool.c"
-#include "IO/Port.c"
-#include "IO/GPU.c"
-
-#include "Data/ISA.c"
-#include "Data/Encoding.c"
+#include "CPU.h"
 
 /// The binary program loaded into the CPU, which can hold up to 4096 bytes of instructions and data
 uint8_t binary[BINARY_SIZE];
@@ -37,7 +24,6 @@ struct Stack valStack;
 /// The ports for input and output
 struct Port ports[8];
 
-/// @brief Initializes the CPU state
 void init() {
 	programCounter = 0;
 	accumulator = 0;
@@ -49,7 +35,6 @@ void init() {
 		registers[i] = 0;
 	}
 
-
 	for (int i = 0; i < PORTS_SIZE; i++) {
 		ports[i].input = 0;
 		ports[i].output = 0;
@@ -58,90 +43,73 @@ void init() {
 	ports[1].update = GPU_p26;
 }
 
-/// @brief Executes a given number of cycles of the loaded binary
-/// @param cycles The number of cycles to execute
 void exec(const int cycles) {
-	#define JUMP (INSTRUCTION_STEP * (((mod) << MOD_OFFSET) | (data)) - INSTRUCTION_STEP) & BINARY_MASK
-	#define CURRENT_PORT ports[mod & MOD_MASK]
-
-	/// Masks the value to be within 0 - 255, ensuring that it stays within the bounds of a byte
-	#define mask(value) ((value) & BYTE_MASK)
-
-	/// Sets either the accumulator or a register to a value, depending on the state of the immediate flag in the modifier
-	#define set(value) if(mod & IMMEDIATE_FLAG) { accumulator = mask(value); } else { registers[data] = mask(value); }
-
-	int mod;
-	int opcode;
-	int data;
-	int regData;
+	
+	int byte1; // The first byte of the instruction
+	int byte2; // The last byte of the instruction
+	int mod; // The modifier of the instruction (last 3 bits of byte1)
 
 	for (int i = 0; i < cycles; i++) {
-		//Fetches the instruction and all the data that the instruction will need
-		opcode = (binary[programCounter] >> INSTRUCTION_OFFSET) & INSTRUCTION_MASK;
-		data = binary[programCounter + DATA_OFFSET] & BYTE_MASK;
-		mod = binary[programCounter] & MOD_MASK;
+		// Fetches the instruction and all the data that the instruction will need
+		byte1 = binary[pc];
+		byte2 = binary[pc + 1];
 		
-		if (mod & IMMEDIATE_FLAG) {
-			regData = data;
-		} else {
-			regData = registers[data];
-		}
+		mod = (byte1 & MOD_MASK);
 
-		//Performs the instruciton
+		// Performs the instruciton
 		switch (opcode) {
 			case JMP:
-				programCounter = JUMP;
+				pc = JUMP;
 				break;
 			case ADD:
-				accumulator = mask(accumulator + regData);
+				acc = mask(acc + regData);
 				break;
 			case SUB:
-				accumulator = mask(accumulator - regData);
+				acc = mask(acc - regData);
 				break;
 			case LSH:
-				accumulator = mask(accumulator << regData);
+				acc = mask(acc << regData);
 				break;
 			case RSH:
-				accumulator = (accumulator >> regData);
+				acc = (acc >> regData);
 				break;
 			case AND:
-				accumulator = (accumulator & regData);
+				acc = (acc & regData);
 				break;
 			case OR:
-				accumulator = (accumulator | regData);
+				acc = (acc | regData);
 				break;
 			case XOR:
-				accumulator = (accumulator ^ regData);
+				acc = (acc ^ regData);
 				break;
 			case LDA:
-				accumulator = regData;
+				acc = regData;
 				break;
 			case STA:
-				registers[data] = accumulator;
+				registers[data] = acc;
 				break;
 			case CND:
-				if (conditionFlag) {
-					programCounter = JUMP;
+				if (cond) {
+					pc = JUMP;
 				}
 				break;
 			case PSH:
-				stack_push(&jmpStack, programCounter);
-				programCounter = JUMP;
+				stack_push(&jmpStack, pc);
+				pc = JUMP;
 				break;
 			case POP:
-				programCounter = stack_pop(&jmpStack) & BINARY_MASK;
+				pc = stack_pop(&jmpStack) & BINARY_MASK;
 				break;
 			case CMP:
-				regData = registers[data];
-				conditionFlag = (mod & CMP_NOT_FLAG) && 1;
-				if(((CMP_LT_FLAG & mod) && accumulator < regData) || ((CMP_EQ_FLAG & mod) && accumulator == regData)) {
-					invert(conditionFlag);
+				cond = mod >> 2;
+				if(((CMP_LT_FLAG & mod) && acc < registers[data]) || ((CMP_EQ_FLAG & mod) && acc == registers[data])) {
+					invert(cond);
 				}
 				break;
 			case ICP:
-				conditionFlag = (mod & CMP_NOT_FLAG) && 1;
-				if(((CMP_LT_FLAG & mod) && accumulator < data) || ((CMP_EQ_FLAG & mod) && accumulator == data)) {
-					invert(conditionFlag);
+				cond = mod >> 2;
+				if(((CMP_LT_FLAG & mod) && acc < data) || ((CMP_EQ_FLAG & mod) && acc == data)) {
+					invert(cond);
 				}
 				break;
 			case STK:
@@ -152,26 +120,23 @@ void exec(const int cycles) {
 				}
 				break;
 			case RPA:
-				accumulator = mask(ports[mask(mod)].output);
+				acc = mask(CURRENT_PORT.output);
 				break;
 			case RPR:
-				registers[data] = ports[mask(mod)].output;
+				registers[DATA_OFFSET] = CURRENT_PORT.output;
 				break;
 			case WPA:
-				port_handlePort(CURRENT_PORT, accumulator);
+				port_handlePort(CURRENT_PORT, acc);
 				break;
 			case WPR:
-				regData = registers[data];
-				port_handlePort(CURRENT_PORT, regData);
+				port_handlePort(CURRENT_PORT, registers[data]);
 				break;
 		}
 
-		programCounter += INSTRUCTION_STEP;
+		pc += INSTRUCTION_STEP;
 	}
-
 }
 
-/// @brief Prints the program counter, accumulator, and all registers in a readable format
 void printState() {
 	clear_screen();
 	printf("PC: %d\n", programCounter / INSTRUCTION_STEP);
@@ -181,7 +146,6 @@ void printState() {
 	}
 }
 
-/// @brief Prints the current state of the screen, which is stored in port 1
 void printScreen() {
 	clear_screen();
 	char result[SCREEN_HEIGHT * (SCREEN_WIDTH * 2)];
@@ -190,8 +154,6 @@ void printScreen() {
 	printf("\n");
 }
 
-/// @brief Reads the entire file and set the binary to the contents of the file, which should be a compiled BPU program
-/// @param filename The file being read, which should be a compiled BPU program
 void readBinary(const char *filename) {
 	FILE *file = fopen(filename, "rb");
 	if (file) {
@@ -203,12 +165,16 @@ void readBinary(const char *filename) {
 	
 }
 
-void speedTest() {
+void speedTest(char flag) {
 	clock_t start = clock();
-	#define CYCLES 500000000
-	exec(CYCLES);
+	#define CYCLES 500000000.0
+	exec((int) CYCLES);
 	double time = clock() - start;
 	printf("%f Hz\n", CLOCKS_PER_SEC * (CYCLES / time));
+
+	if(flag) {
+		speedTest(flag);
+	}
 }
 
 int main(int argc, char *argv[]) {
@@ -219,7 +185,10 @@ int main(int argc, char *argv[]) {
 		} else {
 			switch (argv[i][1]) {
 				case 's':
-					speedTest();
+					speedTest(argv[i][2]);
+					return 0;
+				case 'v':
+					puts("BranchPU VM v0.5, Copyright (C) 2026 QuantumBranching");
 					return 0;
 				default:
 					printf("Unknown flag: %s\n", argv[i]);
