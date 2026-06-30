@@ -1,6 +1,9 @@
 extends TextureButton
 
-var running:bool = false
+var running:bool = false:
+	set(x):
+		running = x
+		OS.low_processor_usage_mode = !x
 var asmCompiler:Assembly
 var code:String = ""
 var time:float = 1.0
@@ -8,9 +11,13 @@ var time2:float = 1.0
 
 var ports:Array[Port]
 
+var testing:bool = false
+
 func _ready() -> void:
 	ports = [null, GPU.new(%Port1), null, null, null, null, null, null]
 	for i in OS.get_cmdline_args():
+		if i.begins_with("-s"):
+			testing = true
 		if i.ends_with(".bpu"):
 			%Edit.text = FileAccess.get_file_as_string(i)
 			code = %Edit.text
@@ -27,18 +34,23 @@ func _ready() -> void:
 func _pressed() -> void:
 	running = !running
 	if running:
-		OS.low_processor_usage_mode = false
 		%Port1.visible = true
 		code = %Edit.text
 		asmCompiler = Assembly.create(code, ports)
 	else:
-		OS.low_processor_usage_mode = true
 		%Port1.visible = false
 		time = 1.0
 		%Edit.text = code
 		asmCompiler = Assembly.new(code)
 
 func _process(delta: float) -> void:
+	if testing:
+		var timer:int = Time.get_ticks_msec()
+		asmCompiler.cpu.exec(1_000_000)
+		print("Clock Speed: ", 1_000_000_000_000 / (Time.get_ticks_usec() - timer), " Hz")
+		testing = false
+		return
+	
 	if Input.is_action_just_pressed("save"):
 			%FileDialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
 			%FileDialog.show()
@@ -63,7 +75,7 @@ func _process(delta: float) -> void:
 	
 	if running:
 		time += delta
-		asmCompiler.cpu.exec(1)
+		asmCompiler.cpu.exec(100)
 			
 		if time > 0.2:
 			if Input.is_key_pressed(KEY_ALT):
