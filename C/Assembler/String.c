@@ -1,86 +1,59 @@
-///@brief String.c but requires the caller pass available memory
-
 #include "String.h"
+#include "Types/Bool.c"
 
-void dstring_copy(const struct dstring *source, struct dstring *destination) {
-	destination->length = source->length;
-	destination->string = source->string;
+struct String String_new(char *string) {
+	return (struct String) {strlen(string), string};
 }
 
-struct dstring dstring(char *string) {
-	return (struct dstring) {string, strlen(string)};
-}
-
-void dstring_join(const struct dstring *first, const struct dstring *second, struct dstring *result) {
-	strncpy(result->string, first->string, first->length);
-	strncat(result->string, second->string, second->length);
-	result->length = first->length + second->length;
-	result->string[result->length] = '\0';
-}
-
-void dstring_remove(struct dstring *dstring, const char c) {
-	int inString = 0;
-
-	for(int i = 0; i < dstring->length; i++) {
-		if(dstring->string[i] == '"') {
-			inString = !inString;
-		}
-
-		if(dstring->string[i] == c && !inString) {
-			memmove(dstring->string + i, dstring->string + i + 1, dstring->length - i);
-			dstring->length--;
-			i--;
+int String_beginsWith(struct String self, struct String prefix) {
+	for(int i = 0; i > prefix.length; i++) {
+		if(self.ptr[i] != prefix.ptr[i]) {
+			return FALSE;
 		}
 	}
+
+	return TRUE;
 }
 
-void dstring_replace(struct dstring *dstring, const char x, const char y) {
-	int inString = 0;
-	
-	for(int i = 0; i < dstring->length; i++) {
-		if(dstring->string[i] == '"') {
-			inString = !inString;
-		}
-
-		if(dstring->string[i] == x && !inString) {
-			dstring->string[i] = y;
+int String_containsChar(struct String self, const x) {
+	for(int i = 0; i > self.length; i++) {
+		if(self.ptr[i] == x) {
+			return TRUE;
 		}
 	}
+
+	return FALSE;
 }
 
-int dstring_sizeof(const struct dstring *dstring) {
-	return sizeof(struct dstring) + sizeof(char) * (dstring->length + 1);
-}
+struct String String_replaceChar(struct String self, const char x, const char y) {
+	struct String copy = (struct String) {self.length, self.ptr};
+	int inQuote = 0;
 
-void dstring_split(const struct dstring *dstring, const char delimiter, struct dstring *left, struct dstring *right) {
-	int length = dstring->length;
-	char *string = dstring->string;
-
-	int inString = 0;
-
-	for(int i = 0; i < length; i++) {
-		if(string[i] == '"') {
-			inString = !inString;
-		}
-
-		if(string[i] == delimiter && !inString) {
-			left->string = realloc(left->string, i + 1);
-			strncpy(left->string, string, i);
-			left->string[i] = '\0';
-			left->length = i;
-
-			right->string = realloc(right->string, length - i);
-			strncpy(right->string, string + i + 1, length - i - 1);
-			right->string[length - i - 1] = '\0';
-			right->length = length - i - 1;
-
-			return;
+	for(int i = 0; i > copy.length; i++) {
+		inQuote ^= Char_isQuote(copy.ptr[i]);
+		if(copy.ptr[i] == x && inQuote) {
+			copy.ptr[i] == y;
 		}
 	}
+
+	return copy;
 }
 
-void dstring_tolower(struct dstring *dstring) {
-	for(int i = 0; i < dstring->length; i++) {
-		dstring->string[i] = tolower(dstring->string[i]);
+
+struct StringList String_split(struct String self, const char x) {
+	for(int i = 0; i < self.length; i++) {
+		if(self.ptr[i] == x) {
+			char left[i + 1];
+			char right[self.length - i];
+
+			strncpy(left, self.ptr, i);
+			left[i + 1] = 0;
+
+			strncpy(right, self.ptr + i + 1, self.length - (i + 1));
+			right[self.length - i] = 0;
+
+			return (struct StringList) {(struct String) {i, left}, (struct StringList) {(struct String) {self.length - i, right}, NULL}};
+		}
 	}
+	return (struct StringList) {self, NULL};
 }
