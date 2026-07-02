@@ -40,4 +40,14 @@ int String_containsChar(struct String self, const x);
 /// @return A modified copy of the original string with the characters replaced
 struct String String_replaceChar(struct String self, const char x, const char y);
 
+/// @brief Splits a string into a StringList
+/// @param self String to split
+/// @param x Character to split upon
+/// @return A string list containing the left and right strings
 struct StringList String_split(struct String self, const char x);
+
+struct String String_joinStrings(struct String left, struct String right);
+
+struct String String_removeChar(struct String self, const char x);
+
+struct String String_toLower(struct String self);
