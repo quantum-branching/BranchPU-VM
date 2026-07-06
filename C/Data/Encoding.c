@@ -3,8 +3,8 @@
 
 /* ------------------------- Size ------------------------- */
 
-///Maximum binary size, 4096 B (4 KB) for 2048 
-///instructions (2 B each)
+/// Maximum binary size, 4096 B (4 KB) for 2048 
+/// instructions (2 B each)
 #define BINARY_SIZE 4096
 ///Total number of registers, 256 for 8-bit register 
 ///addressing
@@ -14,57 +14,58 @@
 
 /* ------------------------- Range ------------------------- */
 
-///The number of possible values for a byte, which is 256 for 
-///an 8-bit value
+/// The number of possible values for a byte, which is 256 for 
+/// an 8-bit value
 #define BYTE_RANGE 256
-///The number of possible values for a modifier, which is 8 
-///for a 3-bit value
+/// The number of possible values for a modifier, which is 8 
+/// for a 3-bit value
 #define MOD_RANGE 8
-///The number of possible values for a double operand, which 
-///is 2048 for an 11-bit value (mod + byte)
+/// The number of possible values for a double operand, which 
+/// is 2048 for an 11-bit value (mod + byte)
 #define DOUBLE_RANGE 2048
 
 /* ------------------------- Masks ------------------------- */
 
-///The maximum value the program counter can reach
+/// The maximum value the program counter can reach
 #define BINARY_MASK 4095
-///Limits the range for which a byte can be in
+/// Limits the range for which a byte can be in
 #define BYTE_MASK 255
-///The mask for the 5-bit opcode in the instruction
+/// The mask for the 5-bit opcode in the instruction
 #define INSTRUCTION_MASK 31
-///The mask for the 3-bit modifier in the instruction
+/// The mask for the 3-bit modifier in the instruction
 #define MOD_MASK 7
 
 /* ------------------------- Offsets ------------------------- */
 
-///The effect of the 3-bit modifier when added to the 8-bit 
-///operand (for an 11-bit value)
+/// The effect of the 3-bit modifier when added to the 8-bit 
+/// operand (for an 11-bit value)
 #define MOD_OFFSET 8
-///The offset of the instruction opcode from the lowest bit 
-///of the a given instruction byte
+/// The offset of the instruction opcode from the lowest bit 
+/// of the a given instruction byte
 #define INSTRUCTION_OFFSET 3
-///Offset from the instruction for which the data lies
+/// Offset from the instruction for which the data lies
 #define DATA_OFFSET 1
 
 /* -------------------------- Steps -------------------------- */
 
-///The distance the CPU must step for a new instruction
+/// The distance the CPU must step for a new instruction
 #define INSTRUCTION_STEP 2
 
 /* -------------------------- Flags -------------------------- */
 
-///The flag for an immediate operand in the modifier
+/// The flag for an immediate operand in the modifier
 #define IMMEDIATE_FLAG 1
-///The flag for a less than condition in the modifier for the CMP 
-///and ICP instructions
+
+/// The flag for a less than condition in the modifier for the CMP 
+/// and ICP instructions
 #define CMP_LT_FLAG 1
-///The flag for an equal to condition in the modifier for the CMP 
-///and ICP instructions
+/// The flag for an equal to condition in the modifier for the CMP 
+/// and ICP instructions
 #define CMP_EQ_FLAG 2
-///The flag for a not condition in the modifier for the CMP and 
-///ICP instructions
+/// The flag for a not condition in the modifier for the CMP and 
+/// ICP instructions
 #define CMP_NOT_FLAG 4
 
-///The flag for popping the stack in the modifier for the STK 
-///instruction
+/// The flag for popping the stack in the modifier for the STK 
+/// instruction
 #define STK_POP_FLAG 2
