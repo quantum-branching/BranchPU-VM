@@ -124,9 +124,24 @@ struct Assembly Assembly_fromString(char *line, char *label, const int lineNo) {
 	return Assembly_new(label, lineNo, upper, lower);
 }
 
-struct Definition Definition_append(struct Definition definitions, char *word, char *definition) {
-	struct Definition current = definitions;
-	while(current.next) {
-		
+void Definition_append(struct Definition *definitions, char *word, char *definition) {
+	struct Definition *current = definitions;
+	struct Definition *next = malloc(sizeof(struct Definition));
+
+	while(current->next) {
+		current = current->next;
+	}
+
+	next->word = word;
+	next->definition = definition;
+
+	current->next = next;
+	return definitions;
+}
+
+void Defintition_free(struct Definition *definition) {
+	if(definition) {
+		Defintition_free(definition->next);
+		free(definition);
 	}
 }

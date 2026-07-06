@@ -51,5 +51,8 @@ struct Assembly Assembly_fromString(char *line, char *label, const int lineNo);
 /// @param definitions A list of definitions
 /// @param word A word to define
 /// @param definition The definition for the word
-/// @return The modified list of definitions
-struct Definition Definition_append(struct Definition definitions, char *word, char *definition);
+void Definition_append(struct Definition *definitions, char *word, char *definition);
+
+/// @brief Frees a definition
+/// @param definition Definition to free
+void Defintition_free(struct Definition *definition);
