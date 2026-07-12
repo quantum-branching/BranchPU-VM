@@ -16,9 +16,8 @@
 | `false`| Boolean `false` (0) |
 | `[`    | Starts a fixed-size array |
 | `]`    | Ends a fixed-size array |
-| `<`    | Starts a fixed-size dictionary |
-| `>`    | Ends a fixed-size dictionary |
-| `'`    | Toggles string or character creation (string → array of ASCII, char → single ASCII value) |
+| `'`    | Starts and ends a character |
+| `"`    | Starts and ends a string |
 | `.`    | Member or element access |
 | `-`    | Subtraction |
 | `+`    | Addition |
@@ -38,6 +37,7 @@
 | Keyword | Purpose |
 |---------|--------|
 | `func`  | Defines a function or subroutine |
+| `reg`   | Parameter can be global |
 | `int`   | Defines an 8-bit integer |
 | `char`  | Integer interpreted as ASCII character |
 | `bool`  | Defines a boolean |
@@ -76,7 +76,7 @@ Executes lower priority operations before higher priority operations. Prioritize
 
 ## 5. Notes on Behavior
 
-- All scalar types are **8-bit integers at runtime**; types are **compile-time interpretations**.  
+- All scalar types are **8-bit integers at runtime**.  
 - **Arrays and dictionaries cannot be cast as a whole**, only elements can be accessed via `.` notation.
   - *This means that* `[idx]` *does not access array elements.*
 - **Strings** are arrays of ASCII values; **characters** are single ASCII integers.  
@@ -98,8 +98,28 @@ arr numbers = [1,2,3]
 str message = 'Hello'
 
 // Function definition
-func add(int x, int y){
-    return x + y
+int fib(reg int n) {
+  int first = 0
+	int temp = 0
+	int second = 1
+
+	while(n != 1) {
+    n -= 1
+		temp = second
+		second += first
+		first = temp
+  }
+	
+	return second
+}
+
+// Recursive function definition
+int factorial(int n) {
+	if(n == 0) {
+		return 1  
+	}
+
+	return n * factorial(n - 1)
 }
 
 // Bitwise operations
