@@ -150,8 +150,7 @@ void printScreen() {
 	clear_screen();
 	char result[SCREEN_HEIGHT * (SCREEN_WIDTH * 2)];
 	result[sizeof(result) - 1] = '\0';
-	printf("%s", GPU_getScreen(result));
-	printf("\n");
+	puts(GPU_getScreen(result));
 }
 
 void readBinary(const char *filename) {
@@ -198,8 +197,8 @@ int main(int argc, char *argv[]) {
 
 	while(TRUE) {
 		exec(240);
-		sleepms(5);
 		printScreen();
+		sleepms(5);
 	}
 
 	return 0;

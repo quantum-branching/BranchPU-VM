@@ -4,25 +4,26 @@
 
 #include <stdlib.h>
 
-void clear_screen();
-
 void sleepms(int ms);
 
 #if defined(_WIN32) || defined(_WIN64)
-  void clear_screen() {
-    system("cls");
-  }
 
-  #define sleepms(x) Sleep(x)
+	#include <windows.h>
+
+	static inline void clear_screen() {
+		printf("\x1b[2J\x1b[H");
+	}
+
+	#define sleepms(x) Sleep(x)
   
 #else
-  void clear_screen() {
-    system("clear");
-  }
+	static inline void clear_screen() {
+		system("clear");
+	}
 
 void sleepms(int ms) {
-    struct timespec ts = { ms / 1000, (ms % 1000) * 1000000 };
-    nanosleep(&ts, NULL);
-    return;
+	struct timespec ts = { ms / 1000, (ms % 1000) * 1000000 };
+	nanosleep(&ts, NULL);
+	return;
 }
 #endif
