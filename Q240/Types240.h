@@ -3,7 +3,8 @@
 #define TRUE 1
 #define FALSE 0
 
-typedef char bool;
+#define push(stack, ptr, src) (stack)[(ptr)++] = src
+#define pop(stack, ptr, dest) dest = (stack)[--(ptr)]
 
 typedef char i8;
 typedef short i16;

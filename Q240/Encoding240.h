@@ -1,14 +1,15 @@
-#define MAX_INSTRUCTIONS 4096
-#define ROM_SIZE 8192
+#define MAX_INSTRUCTIONS 2048
+#define ROM_SIZE 4096
 
 /// Number of user registers
 #define MAX_REGS 16
 #define MAX_PORTS 16
 
 /// Internal registers
-#define CND_FLAG 17
-#define STACK_PTR 18
-#define PC_STACK_PTR 19
+#define NULL_DEST 16
+#define CND_FLAG (registers[17])
+#define STACK_PTR (registers[18])
+#define PC_STACK_PTR (registers[19])
 
 /// User registers and internal registers
 #define VIRTUAL_REGS 20
