@@ -1,4 +1,13 @@
-#include "CPU.h"
+#include "Q280.h"
+
+#define binary binary__280
+#define programCounter programCounter__280
+#define registers registers__280
+#define accumulator accumulator__280
+#define conditionFlag conditionFlag__280
+#define jmpStack jmpStack__280
+#define valStack valStack__280
+#define ports ports__280
 
 /// The binary program loaded into the CPU, which can hold up to 4096 bytes of instructions and data
 uint8_t binary[BINARY_SIZE];
@@ -24,7 +33,7 @@ struct Stack valStack;
 /// The ports for input and output
 struct Port ports[8];
 
-void init() {
+void init280() {
 	programCounter = 0;
 	accumulator = 0;
 	conditionFlag = 0;
@@ -43,7 +52,7 @@ void init() {
 	ports[1].update = GPU_p26;
 }
 
-void exec(const int cycles) {
+void exec280(const int cycles) {
 	
 	int byte1; // The first byte of the instruction
 	int byte2; // The last byte of the instruction
@@ -58,77 +67,77 @@ void exec(const int cycles) {
 
 		// Performs the instruciton
 		switch (opcode) {
-			case JMP:
+			case JMP__280:
 				pc = JUMP;
 				break;
-			case ADD:
+			case ADD__280:
 				acc = mask(acc + regData);
 				break;
-			case SUB:
+			case SUB__280:
 				acc = mask(acc - regData);
 				break;
-			case LSH:
+			case LSH__280:
 				acc = mask(acc << regData);
 				break;
-			case RSH:
+			case RSH__280:
 				acc = (acc >> regData);
 				break;
-			case AND:
+			case AND__280:
 				acc = (acc & regData);
 				break;
-			case OR:
+			case OR__280:
 				acc = (acc | regData);
 				break;
-			case XOR:
+			case XOR__280:
 				acc = (acc ^ regData);
 				break;
-			case LDA:
+			case LDA__280:
 				acc = regData;
 				break;
-			case STA:
+			case STA__280:
 				registers[data] = acc;
 				break;
-			case CND:
+			case CND__280:
 				if (cond) {
 					pc = JUMP;
 				}
 				break;
-			case PSH:
+			case PSH__280:
 				stack_push(&jmpStack, pc);
 				pc = JUMP;
 				break;
-			case POP:
+			case POP__280:
 				pc = stack_pop(&jmpStack) & BINARY_MASK;
 				break;
-			case CMP:
+			case CMP__280:
 				cond = mod >> 2;
 				if(((CMP_LT_FLAG & mod) && acc < registers[data]) || ((CMP_EQ_FLAG & mod) && acc == registers[data])) {
 					invert(cond);
 				}
 				break;
-			case ICP:
+			case ICP__280:
 				cond = mod >> 2;
 				if(((CMP_LT_FLAG & mod) && acc < data) || ((CMP_EQ_FLAG & mod) && acc == data)) {
 					invert(cond);
 				}
 				break;
-			case STK:
+			case STK__280:
 				if (mod & STK_POP_FLAG) {
 					set(stack_pop(&valStack));
 				} else {
 					stack_push(&valStack, regData);
 				}
 				break;
-			case RPA:
+			case RPA__280:
 				acc = mask(CURRENT_PORT.output);
 				break;
-			case RPR:
+			case RPR__280:
 				registers[DATA_OFFSET] = CURRENT_PORT.output;
 				break;
-			case WPA:
+			case WPA__280:
 				port_handlePort(CURRENT_PORT, acc);
 				break;
-			case WPR:
+			case WPR__280:
 				port_handlePort(CURRENT_PORT, registers[data]);
 				break;
 		}
@@ -137,7 +146,7 @@ void exec(const int cycles) {
 	}
 }
 
-void printState() {
+void printState280() {
 	clear_screen();
 	printf("PC: %d\n", programCounter / INSTRUCTION_STEP);
 	printf("ACC: %d\n", accumulator);
@@ -146,14 +155,7 @@ void printState() {
 	}
 }
 
-void printScreen() {
-	clear_screen();
-	char result[SCREEN_HEIGHT * (SCREEN_WIDTH * 2)];
-	result[sizeof(result) - 1] = '\0';
-	puts(GPU_getScreen(result));
-}
-
-void readBinary(const char *filename) {
+void readBin280(const char *filename) {
 	FILE *file = fopen(filename, "rb");
 	if (file) {
 		fread(binary, 1, BINARY_SIZE, file);
@@ -164,7 +166,7 @@ void readBinary(const char *filename) {
 	
 }
 
-void speedTest(char flag) {
+void speedTest280(char flag) {
 	clock_t start = clock();
 	#define CYCLES 500000000.0
 	exec((int) CYCLES);
@@ -172,34 +174,46 @@ void speedTest(char flag) {
 	printf("%f Hz\n", CLOCKS_PER_SEC * (CYCLES / time));
 
 	if(flag) {
-		speedTest(flag);
+		speedTest280(flag);
 	}
 }
 
-int main(int argc, char *argv[]) {
-	init();
-	for(int i = 1; i < argc; i++) {
-		if(argv[i][0] != '-') {
-			readBinary(argv[i]);
-		} else {
-			switch (argv[i][1]) {
-				case 's':
-					speedTest(argv[i][2]);
-					return 0;
-				case 'v':
-					puts("BranchPU VM v0.5, Copyright (C) 2026 QuantumBranching");
-					return 0;
-				default:
-					printf("Unknown flag: %s\n", argv[i]);
-			}
-		}
-	}
+// int q280(int argc, char *argv[]) {
+// 	init();
+// 	for(int i = 1; i < argc; i++) {
+// 		if(argv[i][0] != '-') {
+// 			readBinary(argv[i]);
+// 		} else {
+// 			switch (argv[i][1]) {
+// 				case 'a':
+// 					puts("Assembler not complete");
+// 					return 0;
+// 				case 's':
+// 					speedTest(argv[i][2]);
+// 					return 0;
+// 				case 'v':
+// 					puts("BranchPU VM v0.7, Copyright (C) 2026 QuantumBranching");
+// 					return 0;
+// 				default:
+// 					printf("Unknown flag: %s\n", argv[i]);
+// 			}
+// 		}
+// 	}
 
-	while(TRUE) {
-		exec(240);
-		printScreen();
-		sleepms(5);
-	}
+// 	while(TRUE) {
+// 		exec(240);
+// 		printScreen();
+// 		sleepms(5);
+// 	}
 
-	return 0;
-}
+// 	return 0;
+// }
+
+#undef binary
+#undef programCounter
+#undef registers
+#undef accumulator
+#undef conditionFlag
+#undef jmpStack
+#undef valStack
+#undef ports

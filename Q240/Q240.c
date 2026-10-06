@@ -4,15 +4,29 @@
 
 #include "Types240.h"
 #include "Encoding240.h"
-#include "../Port/Port.c"
-#include "../Port/GPU.c"
 
-u16 binary[MAX_INSTRUCTIONS];
+#include "../OS.c"
+#include "../IO/Port.c"
+#include "../IO/GPU.c"
 
-u8 instructions[MAX_INSTRUCTIONS];
-u8 source1[MAX_INSTRUCTIONS];
-u8 source2[MAX_INSTRUCTIONS];
-u8 destinations[MAX_INSTRUCTIONS];
+#define binary binary__240
+#define instructions instructions__240
+#define source1 source1__240
+#define source2 source2__240
+#define destinations destinations__240
+#define registers registers__240
+#define RAM RAM__240
+#define value_stack value_stack__240
+#define program_stack program_stack__240
+#define programCounter programCounter__240
+#define ports ports__240
+
+u16 binary[MAX_INSTRUCTIONS__240];
+
+u8 instructions[MAX_INSTRUCTIONS__240];
+u8 source1[MAX_INSTRUCTIONS__240];
+u8 source2[MAX_INSTRUCTIONS__240];
+u8 destinations[MAX_INSTRUCTIONS__240];
 
 // +------------+-------+-------+
 // | Reg(s)		| Src	| Dest	|
@@ -23,15 +37,15 @@ u8 destinations[MAX_INSTRUCTIONS];
 // | Value SP	| 18	| 18	|
 // | Prog SP	| 19	| 19	|
 // +------------+-------+-------+
-u8 registers[VIRTUAL_REGS];
-u8 RAM[RAM_SIZE];
-u8 value_stack[RAM_SIZE];
-u16 program_stack[PROG_STACK_COUNT];
+u8 registers[VIRTUAL_REGS__240];
+u8 RAM[RAM_SIZE__240];
+u8 value_stack[RAM_SIZE__240];
+u16 program_stack[PROG_STACK_COUNT__240];
 u16 programCounter;
 
 struct Port ports[16];
 
-usize exec(const usize cycles) {
+usize exec240(const usize cycles) {
 	u16 PC = programCounter;
 
 	u8 dest = destinations[PC];
@@ -45,19 +59,19 @@ usize exec(const usize cycles) {
 
 		// printf("D: %02X (%02X)\t1: %02X (%02X)\t2: %02X (%02X)\tInstruction: %04X\tPC: %03X\n", dest, registers[dest], src1, registers[src1], src2, registers[src2], binary[PC], PC);
 		switch(instructions[PC]) {
-			case ADD:
+			case ADD__240:
 				registers[dest] = registers[src1] + registers[src2];
 				break;
-			case SUB:
+			case SUB__240:
 				registers[dest] = registers[src1] - registers[src2];
 				break;	
-			case LSH:
+			case LSH__240:
 				registers[dest] = registers[src1] << src2;
 				break;
-			case RSH:
+			case RSH__240:
 				registers[dest] = registers[src1] >> src2;
 				break;
-			case LGC:
+			case LGC__240:
 				switch(src2) {
 					case 0:
 						registers[dest] = 0;
@@ -84,57 +98,57 @@ usize exec(const usize cycles) {
 						registers[dest] = 255;
 						break;
 				}
-			case LDI:
+			case LDI__240:
 				registers[dest] = src1;
 				break;
-			case STK:
+			case STK__240:
 				switch(dest) {
 					case 0:
-						push(value_stack, STACK_PTR, registers[src1]);
+						push(value_stack, STACK_PTR__240, registers[src1]);
 						break;
 					case 1:
-						push(value_stack, STACK_PTR, src1);
+						push(value_stack, STACK_PTR__240, src1);
 						break;
 					case 2:
-						pop(value_stack, STACK_PTR, registers[src1]);
+						pop(value_stack, STACK_PTR__240, registers[src1]);
 						break;
 					case 3:
 						break;
 				}
-			case PEK:
+			case PEK__240:
 				registers[dest] = value_stack[registers[src1]];
 				break;
-			case CMP:
+			case CMP__240:
 				switch(dest) {
 					case 0:
-						CND_FLAG = 0;
+						CND_FLAG__240 = 0;
 						break;
 					case 1:
-						CND_FLAG = registers[src1] < registers[src2] ? 1 : 0;
+						CND_FLAG__240 = registers[src1] < registers[src2] ? 1 : 0;
 						break;
 					case 2:
-						CND_FLAG = registers[src1] == registers[src2] ? 1 : 0;
+						CND_FLAG__240 = registers[src1] == registers[src2] ? 1 : 0;
 						break;
 					case 3:
-						CND_FLAG = registers[src1] <= registers[src2] ? 1 : 0;
+						CND_FLAG__240 = registers[src1] <= registers[src2] ? 1 : 0;
 						break;
 					case 4:
-						CND_FLAG = 1;
+						CND_FLAG__240 = 1;
 						break;
 					case 5:
-						CND_FLAG = registers[src1] >= registers[src2] ? 1 : 0;
+						CND_FLAG__240 = registers[src1] >= registers[src2] ? 1 : 0;
 						break;
 					case 6:
-						CND_FLAG = registers[src1] != registers[src2] ? 1 : 0;
+						CND_FLAG__240 = registers[src1] != registers[src2] ? 1 : 0;
 						break;
 					case 7:
-						CND_FLAG = registers[src1] > registers[src2] ? 1 : 0;
+						CND_FLAG__240 = registers[src1] > registers[src2] ? 1 : 0;
 						break;
 				}
 				break;
-			case JMP:
+			case JMP__240:
 				if(src1 & 0x8) {
-					if(CND_FLAG) {
+					if(CND_FLAG__240) {
 						PC = (dest << 8) + src2 - 1;
 					}
 				} else {
@@ -142,60 +156,62 @@ usize exec(const usize cycles) {
 				}
 
 				break;
-			case PSH:
-				push(program_stack, PC_STACK_PTR, PC);
+			case PSH__240:
+				push(program_stack, PC_STACK_PTR__240, PC);
 
 				PC = (src1 << 8) + src2;
 				PC -= 1;
 				break;
-			case POP:
+			case POP__240:
 				switch(dest) {
 					case 0:
+						programCounter = PC;
 						return i;
 					case 1:
 						if(registers[src1] < registers[src2]) {
-							pop(program_stack, PC_STACK_PTR, PC);
+							pop(program_stack, PC_STACK_PTR__240, PC);
 						}
+						break;
 					case 2:
 						if(registers[src1] == registers[src2]) {
-							pop(program_stack, PC_STACK_PTR, PC);
+							pop(program_stack, PC_STACK_PTR__240, PC);
 						}
 						break;
 					case 3:
 						if(registers[src1] <= registers[src2]) {
-							pop(program_stack, PC_STACK_PTR, PC);
+							pop(program_stack, PC_STACK_PTR__240, PC);
 						}
 						break;
 					case 4:
-						pop(program_stack, PC_STACK_PTR, PC);
+						pop(program_stack, PC_STACK_PTR__240, PC);
 						break;
 					case 5:
 						if(registers[src1] >= registers[src2]) {
-							pop(program_stack, PC_STACK_PTR, PC);
+							pop(program_stack, PC_STACK_PTR__240, PC);
 						}
 						break;
 					case 6:
 						if(registers[src1] != registers[src2]) {
-							pop(program_stack, PC_STACK_PTR, PC);
+							pop(program_stack, PC_STACK_PTR__240, PC);
 						}
 						break;
 					case 7:
 						if(registers[src1] > registers[src2]) {
-							pop(program_stack, PC_STACK_PTR, PC);
+							pop(program_stack, PC_STACK_PTR__240, PC);
 						}
 						break;
 				}
 				break;
-			case LOD:
+			case LOD__240:
 				registers[dest] = RAM[src1];
 				break;
-			case STR:
+			case STR__240:
 				RAM[dest] = registers[src1];
 				break;
-			case RPT:
+			case RPT__240:
 				registers[dest] = ports[src1].output;
 				break;
-			case WPT:
+			case WPT__240:
 				port_handlePort(ports[dest], registers[src1]);
 				break;
 		}
@@ -207,7 +223,7 @@ usize exec(const usize cycles) {
 	return cycles;
 }
 
-void readBinary(const char *filename) {
+void readBin240(const char *filename) {
 	FILE *file = fopen(filename, "rb");
 
 	if(file == NULL) {
@@ -215,13 +231,13 @@ void readBinary(const char *filename) {
 		return;
 	}
 
-	usize count = fread(binary, sizeof(*binary), MAX_INSTRUCTIONS, file);
+	usize count = fread(binary, sizeof(*binary), MAX_INSTRUCTIONS__240, file);
 	
 	for(int i = 0; i < count; i++) {
 		binary[i] = ((binary[i] & 0xFF) << 8) + ((binary[i] & 0xFF00) >> 8);
 	}
 
-	for(int i = count; i < MAX_INSTRUCTIONS; i++) {
+	for(int i = count; i < MAX_INSTRUCTIONS__240; i++) {
 		binary[i] = 0;
 	}
 
@@ -229,94 +245,94 @@ void readBinary(const char *filename) {
 }
 
 u8 destination(u16 reg) {
-	reg = (reg & NIB2) >> 8;
-	return reg ? reg : NULL_DEST;
+	reg = (reg & NIB2__240) >> 8;
+	return reg ? reg : NULL_DEST__240;
 }
 
-void unpack() {
+void unpack240() {
 	ports[1].update = GPU_p26;
 
-	for(u32 i = 0; i < MAX_INSTRUCTIONS; i++) {
+	for(u32 i = 0; i < MAX_INSTRUCTIONS__240; i++) {
 		instructions[i] = binary[i] >> 12;
 		switch(instructions[i]) {
 			case 0x0:
 				destinations[i] = destination(binary[i]);
-				source1[i] = (binary[i] & NIB3) >> 4;
-				source2[i] = binary[i] & NIB4;
+				source1[i] = (binary[i] & NIB3__240) >> 4;
+				source2[i] = binary[i] & NIB4__240;
 				break;
 			case 0x1:
 				destinations[i] = destination(binary[i]);
-				source1[i] = (binary[i] & NIB3) >> 4;
-				source2[i] = binary[i] & NIB4;
+				source1[i] = (binary[i] & NIB3__240) >> 4;
+				source2[i] = binary[i] & NIB4__240;
 				break;
 			case 0x2:
 				destinations[i] = destination(binary[i]);
-				source1[i] = (binary[i] & NIB3) >> 4;
-				source2[i] = binary[i] & NIB4;
+				source1[i] = (binary[i] & NIB3__240) >> 4;
+				source2[i] = binary[i] & NIB4__240;
 				break;
 			case 0x3:
 				destinations[i] = destination(binary[i]);
-				source1[i] = (binary[i] & NIB3) >> 4;
-				source2[i] = binary[i] & NIB4;
+				source1[i] = (binary[i] & NIB3__240) >> 4;
+				source2[i] = binary[i] & NIB4__240;
 				break;
 			case 0x4:
-				destinations[i] = (binary[i] & NIB3) >> 4;
-				source1[i] = binary[i] & NIB4;
+				destinations[i] = (binary[i] & NIB3__240) >> 4;
+				source1[i] = binary[i] & NIB4__240;
 				source2[i] = (binary[i] & 0x0700) >> 8;
 				break;
 			case 0x5:
 				destinations[i] = destination(binary[i]);
-				source1[i] = binary[i] & IMM;
+				source1[i] = binary[i] & IMM__240;
 				source2[i] = 0;
 				break;
 			case 0x6:
-				destinations[i] = (binary[i] & NIB2) >> 8;
-				source1[i] = (binary[i] & NIB3) >> 4;
-				source2[i] = binary[i] & NIB4;
+				destinations[i] = (binary[i] & NIB2__240) >> 8;
+				source1[i] = (binary[i] & NIB3__240) >> 4;
+				source2[i] = binary[i] & NIB4__240;
 				break;
 			case 0x7:
 				destinations[i] = destination(binary[i]);
-				source1[i] = binary[i] & NIB3;
+				source1[i] = binary[i] & NIB3__240;
 				source2[i] = 0;
 				break;
 			case 0x8:
 				destinations[i] = (binary[i] & 0x0700) >> 8;
-				source1[i] = (binary[i] & NIB3) >> 4;
-				source2[i] = binary[i] & NIB4;
+				source1[i] = (binary[i] & NIB3__240) >> 4;
+				source2[i] = binary[i] & NIB4__240;
 				break;
 			case 0x9:
 				destinations[i] = (binary[i] & 0x0700) >> 8;
 				source1[i] = (binary[i] & 0x0F00) >> 8;
-				source2[i] = binary[i] & IMM;
+				source2[i] = binary[i] & IMM__240;
 				break;
 			case 0xA:
 				destinations[i] = 0;
 				source1[i] = (binary[i] & 0x0F00) >> 8;
-				source2[i] = binary[i] & IMM;
+				source2[i] = binary[i] & IMM__240;
 				break;
 			case 0xB:
 				destinations[i] = (binary[i] & 0x0700) >> 8;
-				source1[i] = (binary[i] & NIB3) >> 4;
-				source2[i] = binary[i] & NIB4;
+				source1[i] = (binary[i] & NIB3__240) >> 4;
+				source2[i] = binary[i] & NIB4__240;
 				break;
 			case 0xC:
 				destinations[i] = destination(binary[i]);
-				source1[i] = binary[i] & IMM;
+				source1[i] = binary[i] & IMM__240;
 				source2[i] = 0;
 				break;
 			case 0xD:
-				destinations[i] = binary[i] & IMM;
-				source1[i] = (binary[i] & NIB2) >> 8;
+				destinations[i] = binary[i] & IMM__240;
+				source1[i] = (binary[i] & NIB2__240) >> 8;
 				source2[i] = 0;
 				break;
 			case 0xE:
 				destinations[i] = destination(binary[i]);
-				source1[i] = (binary[i] & NIB3) >> 4;
+				source1[i] = (binary[i] & NIB3__240) >> 4;
 				source2[i] = 0;
 				break;
 			case 0xF:
-				destinations[i] = (binary[i] & NIB2) >> 8;
-				source1[i] = (binary[i] & NIB3) >> 4;
+				destinations[i] = (binary[i] & NIB2__240) >> 8;
+				source1[i] = (binary[i] & NIB3__240) >> 4;
 				source2[i] = 0;
 				break;
 			default:
@@ -325,59 +341,72 @@ void unpack() {
 	}
 }
 
-void printScreen() {
-	char result[SCREEN_HEIGHT * (SCREEN_WIDTH * 2)];
-	GPU_getScreen(result);
-	result[sizeof(result) - 1] = '\0';
-	puts(result);
-}
-
-void printState() {
+void printState240() {
 	for(int i = 0; i < 16; i++) {
 		printf("r%X: %X\t", i, registers[i]);
 		if(i % 4 == 3) {
 			puts("");
 		}
 	}
+	printf("PC: %03X\t\t", programCounter);
+	printf("CND: %d\n", registers[17]);
+	printf("Val SP: %02X\t", registers[18]);
+	printf("Adr SP: %02X\n", registers[19]);
 }
 
-void speedTest(char flag) {
+void speedTest240(char flag) {
 	clock_t start = clock();
 	#define CYCLES 500000000.0
-	usize clocks = exec((usize) CYCLES);
+	usize clocks = exec240((usize) CYCLES);
 	double time = clock() - start;
 	printf("%f Hz\n", CLOCKS_PER_SEC * (clocks / time));
 
 	if(flag) {
-		speedTest(flag);
+		speedTest240(flag);
 	}
 }
 
 
-int main(int argc, char **argv) {
-	for(int i = 1; i < argc; i++) {
-		if(argv[i][0] != '-') {
-			readBinary(argv[i]);
-			unpack();
-		} else {
-			switch (argv[i][1]) {
-				case 'a':
-					puts("Assembler not complete");
-					return 0;
-				case 's':
-					speedTest(argv[i][2]);
-					return 0;
-				case 'v':
-					puts("BranchPU VM v0.7, Copyright (C) 2026 QuantumBranching");
-					return 0;
-				default:
-					printf("Unknown flag: %s\n", argv[i]);
-			}
-		}
-	}
+// int main(int argc, char **argv) {
+// 	for(int i = 1; i < argc; i++) {
+// 		if(argv[i][0] != '-') {
+// 			readBinary(argv[i]);
+// 			unpack();
+// 		} else {
+// 			switch (argv[i][1]) {
+// 				case 'a':
+// 					puts("Assembler not complete");
+// 					return 0;
+// 				case 's':
+// 					speedTest(argv[i][2]);
+// 					return 0;
+// 				case 'v':
+// 					puts("BranchPU VM v0.7, Copyright (C) 2026 QuantumBranching");
+// 					return 0;
+// 				default:
+// 					printf("Unknown flag: %s\n", argv[i]);
+// 			}
+// 		}
+// 	}
 
-	for(;;) {
-		exec(200);
-		printScreen();
-	}
-}
+// 	for(;;) {
+// 		exec240(240);
+// 		clear_screen();
+// 		printState();
+// 		printScreen();
+// 		puts("");
+// 		sleepms(5);
+// 	}
+// }
+
+#undef binary
+#undef instructions
+#undef source1
+#undef source2
+#undef destinations
+#undef registers
+#undef RAM
+#undef value_stack
+#undef program_stack
+#undef programCounter
+#undef ports

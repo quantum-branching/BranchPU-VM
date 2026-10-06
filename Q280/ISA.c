@@ -2,49 +2,49 @@
 /// @brief The instruction set architecture for the BPU, which defines the opcodes and their effects on the CPU state
 
 ///Jumps to an 11-bit address using the modifier as the high bits and the operand as the low bits
-#define JMP 0x00
+#define JMP__280 0x00
 ///Sets the accumulator to the sum of the accumulator and a value
-#define ADD 0x01
+#define ADD__280 0x01
 ///Sets the accumulator to the difference of the accumulator and a value
-#define SUB 0x02
+#define SUB__280 0x02
 ///Left shifts the accumulator by a value
-#define LSH 0x03
+#define LSH__280 0x03
 ///Right shifts the accumulator by a value
-#define RSH 0x04
+#define RSH__280 0x04
 ///Sets the accumulator to the bitwise AND of the accumulator and a value
-#define AND 0x05
+#define AND__280 0x05
 ///Sets the accumulator to the bitwise OR of the accumulator and a value
-#define OR  0x06
+#define OR__280  0x06
 ///Sets the accumulator to the bitwise XOR of the accumulator and a value
-#define XOR 0x07
+#define XOR__280 0x07
 ///Load Accumulator from Register
-#define LDA 0x08
+#define LDA__280 0x08
 ///Load Accumulator from Register
-#define LDI 0x28
+#define LDI__280 0x28
 ///Store Accumulator to Register
-#define STA 0x09
+#define STA__280 0x09
 ///Conditional Jump
-#define CND 0x0A
+#define CND__280 0x0A
 ///Push to Program Counter Stack
-#define PSH 0x0B
+#define PSH__280 0x0B
 ///Pop from Program Counter Stack
-#define POP 0x0C
+#define POP__280 0x0C
 ///Compare Accumulator with Register to Condition Flag
-#define CMP 0x0D
+#define CMP__280 0x0D
 ///Immediate Comparison
-#define ICP 0x0E
+#define ICP__280 0x0E
 ///Value Stack
-#define STK 0x0F
+#define STK__280 0x0F
 ///Read Port to Accumulator
-#define RPA 0x10
+#define RPA__280 0x10
 ///Read Port to Register
-#define RPR 0x11
+#define RPR__280 0x11
 ///Write Port from Accumulator
-#define WPA 0x12
+#define WPA__280 0x12
 ///Write Port from Register
-#define WPR 0x13
+#define WPR__280 0x13
 ///Peek at a value in the Value Stack
-#define PEK 0x14
+#define PEK__280 0x14
 
 #define STRING_JMP 0x1BCA
 #define STRING_ADD 0x0310

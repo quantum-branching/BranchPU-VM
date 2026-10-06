@@ -1,7 +1,8 @@
-#include "Types/String.c"
-#include "Data/ISA.c"
 #include <stdio.h>
 #include <ctype.h>
+
+#include "../Types/String.c"
+#include "../Q280/ISA.c"
 
 #define Assembly_new(label, line, upper, lower) ((struct Assembly) {label, line, upper, lower})
 
