@@ -19,6 +19,9 @@ void sleepms(int ms);
 	#define sleepms(x) Sleep(x)
   
 #else
+
+	#include <time.h>
+
 	static inline void clear_screen() {
 		printf("\x1b[2J\x1b[H");
 	}

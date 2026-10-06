@@ -1,5 +1,3 @@
-#pragma once
-
 #define PORT 1
 #define OPERAND_MASK 31
 

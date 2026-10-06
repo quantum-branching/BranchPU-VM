@@ -1,3 +1,5 @@
+#pragma once
+
 #define SCREEN_PORT 1
 #define OPERAND_MASK 31
 

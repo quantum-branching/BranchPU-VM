@@ -5,9 +5,8 @@
 #include "Types240.h"
 #include "Encoding240.h"
 
-#include "../OS.c"
 #include "../IO/Port.c"
-#include "../IO/GPU.c"
+#include "../IO/GPU.h"
 
 #define binary binary__240
 #define instructions instructions__240
@@ -366,38 +365,6 @@ void speedTest240(char flag) {
 	}
 }
 
-
-// int main(int argc, char **argv) {
-// 	for(int i = 1; i < argc; i++) {
-// 		if(argv[i][0] != '-') {
-// 			readBinary(argv[i]);
-// 			unpack();
-// 		} else {
-// 			switch (argv[i][1]) {
-// 				case 'a':
-// 					puts("Assembler not complete");
-// 					return 0;
-// 				case 's':
-// 					speedTest(argv[i][2]);
-// 					return 0;
-// 				case 'v':
-// 					puts("BranchPU VM v0.7, Copyright (C) 2026 QuantumBranching");
-// 					return 0;
-// 				default:
-// 					printf("Unknown flag: %s\n", argv[i]);
-// 			}
-// 		}
-// 	}
-
-// 	for(;;) {
-// 		exec240(240);
-// 		clear_screen();
-// 		printState();
-// 		printScreen();
-// 		puts("");
-// 		sleepms(5);
-// 	}
-// }
 
 #undef binary
 #undef instructions

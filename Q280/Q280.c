@@ -1,5 +1,18 @@
 #include "Q280.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <time.h>
+
+#include "ISA.c"
+#include "Encoding.c"
+
+#include "../Types/Stack.c"
+#include "../Types/Bool.c"
+#include "../IO/Port.c"
+#include "../IO/GPU.h"
+
 #define binary binary__280
 #define programCounter programCounter__280
 #define registers registers__280
@@ -8,6 +21,20 @@
 #define jmpStack jmpStack__280
 #define valStack valStack__280
 #define ports ports__280
+
+#define mask(value) ((value) & BYTE_MASK) /// Masks the value to be within 0 - 255, ensuring that it stays within the bounds of a byte
+#define set(value) if(mod & IMMEDIATE_FLAG) { acc = mask(value); } else { registers[data] = mask(value); } /// Sets either the accumulator or a register to a value, depending on the state of the immediate flag in the modifier
+
+#define JUMP ((INSTRUCTION_STEP * ((mod << MOD_OFFSET) | data) - INSTRUCTION_STEP) & BINARY_MASK)
+#define CURRENT_PORT ports[mod]
+
+#define opcode (byte1 >> INSTRUCTION_OFFSET) // The opcode of the instruction (first 5 bits of byte1)
+#define regData ((mod & IMMEDIATE_FLAG) ? data : registers[data]) // The data to be used in the instruction
+
+#define acc accumulator
+#define pc programCounter
+#define cond conditionFlag
+#define data byte2
 
 /// The binary program loaded into the CPU, which can hold up to 4096 bytes of instructions and data
 uint8_t binary[BINARY_SIZE];
@@ -147,7 +174,6 @@ void exec280(const int cycles) {
 }
 
 void printState280() {
-	clear_screen();
 	printf("PC: %d\n", programCounter / INSTRUCTION_STEP);
 	printf("ACC: %d\n", accumulator);
 	for (int i = 0; i < REGISTERS_SIZE; i++) {
@@ -177,37 +203,6 @@ void speedTest280(char flag) {
 		speedTest280(flag);
 	}
 }
-
-// int q280(int argc, char *argv[]) {
-// 	init();
-// 	for(int i = 1; i < argc; i++) {
-// 		if(argv[i][0] != '-') {
-// 			readBinary(argv[i]);
-// 		} else {
-// 			switch (argv[i][1]) {
-// 				case 'a':
-// 					puts("Assembler not complete");
-// 					return 0;
-// 				case 's':
-// 					speedTest(argv[i][2]);
-// 					return 0;
-// 				case 'v':
-// 					puts("BranchPU VM v0.7, Copyright (C) 2026 QuantumBranching");
-// 					return 0;
-// 				default:
-// 					printf("Unknown flag: %s\n", argv[i]);
-// 			}
-// 		}
-// 	}
-
-// 	while(TRUE) {
-// 		exec(240);
-// 		printScreen();
-// 		sleepms(5);
-// 	}
-
-// 	return 0;
-// }
 
 #undef binary
 #undef programCounter

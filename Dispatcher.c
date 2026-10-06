@@ -1,7 +1,12 @@
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-#include "Q280/Q280.c"
-#include "Q240/Q240.c"
+#include "Q280/Q280.h"
+#include "Q240/Q240.h"
+
+#include "IO/GPU.h"
+#include "OS.c"
 
 void printScreen() {
 	char result[SCREEN_HEIGHT * (SCREEN_WIDTH * 2)];
@@ -11,7 +16,7 @@ void printScreen() {
 }
 
 int main(int argc, char **argv) {
-    u16 version = 0;
+    unsigned short version = 0;
 
     for(int i = 1; i < argc; i++) {
         if(argv[i][0] != '-') {
@@ -67,7 +72,7 @@ int main(int argc, char **argv) {
             sleepms(5);
         }
     } else if(version == 280) {
-        while(TRUE) {
+        for(;;) {
 			exec280(240);
 			clear_screen();
 			printScreen();
