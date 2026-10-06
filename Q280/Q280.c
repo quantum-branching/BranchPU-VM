@@ -169,7 +169,7 @@ void readBin280(const char *filename) {
 void speedTest280(char flag) {
 	clock_t start = clock();
 	#define CYCLES 500000000.0
-	exec((int) CYCLES);
+	exec280((int) CYCLES);
 	double time = clock() - start;
 	printf("%f Hz\n", CLOCKS_PER_SEC * (CYCLES / time));
 

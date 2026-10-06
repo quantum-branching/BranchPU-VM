@@ -1,3 +1,5 @@
+#pragma once
+
 /// @file Encoding.c
 /// @brief The encoding for the BPU, which defines the format of the instructions and how to decode them
 

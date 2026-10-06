@@ -15,9 +15,9 @@ int main(int argc, char **argv) {
 
     for(int i = 1; i < argc; i++) {
         if(argv[i][0] != '-') {
-            char *file_ext = strchr(argv[i], ".");
-            if(file_ext++ && atoi(file_ext)) {
-                version = atoi(file_ext);
+            char *file_ext = strchr(argv[i], '.');
+            if(file_ext++ && strtol(++file_ext, NULL, 10)) {
+                version = strtol(file_ext, NULL, 10);
 				
 				if(version == 240) {
 					readBin240(argv[i]);
@@ -26,11 +26,11 @@ int main(int argc, char **argv) {
                     init280();
 					readBin280(argv[i]);
 				} else {
-					puts("Architecture not supported");
+					printf("Architecture not supported: %s\n", file_ext);
 				}
 
             } else {
-                puts("Unknown filetype");
+                printf("Can't read file extension: %s\n", file_ext);
             }
 			
 		} else {
@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
                     } else if(version == 280) {
                         speedTest280(argv[i][2]);
                     } else {
-                        puts("Architecture not supported");
+                        printf("Architecture not supported: .q%dx\n", version);
                     }
 
 					return 0;
@@ -74,6 +74,6 @@ int main(int argc, char **argv) {
 			sleepms(5);
 		}
     } else {
-        puts("Architecture not supported");
+        printf("Architecture not supported: .q%03dx\n", version);
     }
 }

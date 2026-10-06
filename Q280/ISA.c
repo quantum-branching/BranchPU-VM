@@ -1,3 +1,5 @@
+#pragma once
+
 /// @file ISA.c
 /// @brief The instruction set architecture for the BPU, which defines the opcodes and their effects on the CPU state
 

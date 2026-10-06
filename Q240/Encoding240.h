@@ -1,3 +1,5 @@
+#pragma once
+
 #define MAX_INSTRUCTIONS__240 2048
 #define ROM_SIZE__240 4096
 

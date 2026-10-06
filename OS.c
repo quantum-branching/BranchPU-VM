@@ -1,3 +1,5 @@
+#pragma once
+
 //// @file OS.c
 /// @brief The OS-specific system commands for the BPU, which 
 /// include clearing the screen and printing the screen
@@ -18,7 +20,7 @@ void sleepms(int ms);
   
 #else
 	static inline void clear_screen() {
-		system("clear");
+		printf("\x1b[2J\x1b[H");
 	}
 
 void sleepms(int ms) {
