@@ -89,8 +89,8 @@ usize exec242(const size_t cycles) {
 				setReg(nibble1, (xor | (ior & ior_flag) | (nor & nor_flag)) ^ inv_flag);
 				break;
 			case BRH__242:
-				PC = ((((ZF__242 >> 1) | CF__242) != (nibble2 && 0x3)) == !(nibble2 & 0x4)) ? (regs[nibble1] - 1) >> 1 : PC;
-				break;
+				PC = ((((ZF__242 << 1) | CF__242) != (nibble2 & 0x3)) == !(nibble2 & 0x4)) ? (regs[nibble1] - 1) << 1 : PC;
+    			break;
 			case CAL__242:
 				break;
 			case RET__242:
