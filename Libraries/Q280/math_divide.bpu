@@ -1,0 +1,26 @@
+#removeBlank
+
+JMP 0 .math_div_main
+
+.math_divide
+	LDI #0
+	STA $3
+	
+	.while_math_divide
+	LDA $1
+	CMP 1 $2
+	CND .return
+		LDA $1
+		SUB $2
+		STA $1
+		
+		LDA $3
+		ADD #1
+		STA $3
+		JMP .while_math_divide
+	
+	.return
+		LDA $3
+		POP
+
+.math_div_main
