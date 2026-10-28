@@ -230,7 +230,7 @@ void readBin240(const char *filename) {
 	fclose(file);
 }
 
-u8 destination242(u16 reg) {
+u8 destination240(u16 reg) {
 	reg = (reg & NIB2__240) >> 8;
 	return reg ? reg : NULL_DEST__240;
 }
@@ -242,22 +242,22 @@ void unpack240() {
 		instructions__240[i] = binary_240[i] >> 12;
 		switch(instructions__240[i]) {
 			case 0x0:
-				destinations__240[i] = destination242(binary_240[i]);
+				destinations__240[i] = destination240(binary_240[i]);
 				source1__240[i] = (binary_240[i] & NIB3__240) >> 4;
 				source2_240[i] = binary_240[i] & NIB4__240;
 				break;
 			case 0x1:
-				destinations__240[i] = destination242(binary_240[i]);
+				destinations__240[i] = destination240(binary_240[i]);
 				source1__240[i] = (binary_240[i] & NIB3__240) >> 4;
 				source2_240[i] = binary_240[i] & NIB4__240;
 				break;
 			case 0x2:
-				destinations__240[i] = destination242(binary_240[i]);
+				destinations__240[i] = destination240(binary_240[i]);
 				source1__240[i] = (binary_240[i] & NIB3__240) >> 4;
 				source2_240[i] = binary_240[i] & NIB4__240;
 				break;
 			case 0x3:
-				destinations__240[i] = destination242(binary_240[i]);
+				destinations__240[i] = destination240(binary_240[i]);
 				source1__240[i] = (binary_240[i] & NIB3__240) >> 4;
 				source2_240[i] = binary_240[i] & NIB4__240;
 				break;
@@ -267,7 +267,7 @@ void unpack240() {
 				source2_240[i] = (binary_240[i] & 0x0700) >> 8;
 				break;
 			case 0x5:
-				destinations__240[i] = destination242(binary_240[i]);
+				destinations__240[i] = destination240(binary_240[i]);
 				source1__240[i] = binary_240[i] & IMM__240;
 				source2_240[i] = 0;
 				break;
@@ -277,7 +277,7 @@ void unpack240() {
 				source2_240[i] = binary_240[i] & NIB4__240;
 				break;
 			case 0x7:
-				destinations__240[i] = destination242(binary_240[i]);
+				destinations__240[i] = destination240(binary_240[i]);
 				source1__240[i] = binary_240[i] & NIB3__240;
 				source2_240[i] = 0;
 				break;
@@ -302,7 +302,7 @@ void unpack240() {
 				source2_240[i] = binary_240[i] & NIB4__240;
 				break;
 			case 0xC:
-				destinations__240[i] = destination242(binary_240[i]);
+				destinations__240[i] = destination240(binary_240[i]);
 				source1__240[i] = binary_240[i] & IMM__240;
 				source2_240[i] = 0;
 				break;
@@ -312,7 +312,7 @@ void unpack240() {
 				source2_240[i] = 0;
 				break;
 			case 0xE:
-				destinations__240[i] = destination242(binary_240[i]);
+				destinations__240[i] = destination240(binary_240[i]);
 				source1__240[i] = (binary_240[i] & NIB3__240) >> 4;
 				source2_240[i] = 0;
 				break;

@@ -4,6 +4,7 @@
 
 #include "Q280/Q280.h"
 #include "Q240/Q240.h"
+#include "Q242/Q242.h"
 
 #include "IO/GPU.h"
 #include "OS.c"
@@ -25,14 +26,20 @@ int main(int argc, char **argv) {
 			if(file_ext && strtol(file_ext + 2, NULL, 10)) {
 				version = strtol(file_ext + 2, NULL, 10);
 
-				if(version == 240) {
-					readBin240(argv[i]);
-					unpack240();
-				} else if(version == 280) {
-					init280();
-					readBin280(argv[i]);
-				} else {
-					printf("Architecture not supported: %s\n", file_ext);
+				switch(version) {
+					case 240:
+						readBin240(argv[i]);
+						unpack240();
+						break;
+					case 242:
+						readBin242(argv[i]);
+						break;
+					case 280:
+						init280();
+						readBin280(argv[i]);
+						break;
+					default:
+						printf("Architecture not supported: %s\n", file_ext);
 				}
 
 			} else {

@@ -1,4 +1,5 @@
 #define BINARY_SIZE__242 512
+#define CALL_STACK_SIZE__242 16
 #define REG_COUNT__242 16
 #define RAM_SIZE__242 256
 

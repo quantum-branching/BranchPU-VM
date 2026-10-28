@@ -1,6 +1,7 @@
 #pragma once
 
-#include <ctype.h>
+#include <stddef.h>
+
 
 size_t exec240(const size_t cycles);
 

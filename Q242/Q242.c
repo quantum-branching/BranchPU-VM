@@ -6,21 +6,22 @@
 #include <stdint.h>
 #include <time.h>
 
-#include "../Types/Stack.c"
-#include "../Types/Bool.c"
 #include "../IO/Port.c"
 #include "../IO/GPU.h"
 #include "../Q240/Types240.h"
 
 /// Program Counter
-u16 PC__242;
+u16 PC__242 = 0;
 /// Carry Flag
-u8 CF__242;
+u8 CF__242 = 0;
 /// Zero Flag
-u8 ZF__242;
+u8 ZF__242 = 0;
+
+u8 call_stack_ptr__242 = 0;
 
 u8 binary__242[BINARY_SIZE__242];
 u8 RAM__242[RAM_SIZE__242];
+u8 call_stack__242[CALL_STACK_SIZE__242];
 u8 registers__242[REG_COUNT__242 + 1];
 
 void init242() {
@@ -50,7 +51,7 @@ inline u8 destination242(u8 destNibble) {
 
 #define setReg(destNibble, value) regs[(destNibble) ? (destNibble) : REG_COUNT__242] = value
 
-usize exec242(const size_t cycles) {
+usize exec242(const usize cycles) {
 	u16 PC = PC__242;
 
 	u8 nibble0;
@@ -92,8 +93,14 @@ usize exec242(const size_t cycles) {
 				PC = ((((ZF__242 << 1) | CF__242) != (nibble2 & 0x3)) == !(nibble2 & 0x4)) ? (regs[nibble1] - 1) << 1 : PC;
     			break;
 			case CAL__242:
+				if((((ZF__242 << 1) | CF__242) != (nibble2 & 0x3)) == !(nibble2 & 0x4)) {
+					push(call_stack__242, call_stack_ptr__242, PC);
+					PC = (regs[nibble1] - 1) << 1;
+				}
+
 				break;
 			case RET__242:
+				pop(call_stack__242, call_stack_ptr__242, PC) - 2;
 				break;
 			case ACH__242:
 				break;

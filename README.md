@@ -1,3 +1,23 @@
+### What is this?
+
+This is a set of virtual machines for some instruction architectures that I have built, collectively know as BranchPU ISAs.
+
+Since there is more than one architecture, I have developed a naming scheme as follows (where terminating `_0` is dropped):
+
+`"Q" + dec2hex(floor(instruction_length / 8)) + dec2hex(argument_length) + dec2hex(design) + "_" + String(iteration)`
+
+Currently Supports:
+* Q240
+* Q280
+
+Currently Unsupported:
+* Q241
+* Q281
+* Q340
+
+In progress:
+* Q242
+
 ### Obtaining Executable
 
 Download pre-compiled Executable (Windows or Linux)
