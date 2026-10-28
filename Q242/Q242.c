@@ -21,6 +21,7 @@ u8 call_stack_ptr__242 = 0;
 
 u8 binary__242[BINARY_SIZE__242];
 u8 RAM__242[RAM_SIZE__242];
+u8 cache__242[16];
 u8 call_stack__242[CALL_STACK_SIZE__242];
 u8 registers__242[REG_COUNT__242 + 1];
 
@@ -103,12 +104,22 @@ usize exec242(const usize cycles) {
 				pop(call_stack__242, call_stack_ptr__242, PC) - 2;
 				break;
 			case ACH__242:
+				for(u8 i = 0; i < 16; i++) {
+					cache__242[i] = RAM__242[i + (regs[nibble1] & 0xF0)];
+				}
+
 				break;
 			case SCH__242:
+				for(u8 i = 0; i < 16; i++) {
+					RAM__242[i + (regs[nibble1] & 0xF0)] = cache__242[i];
+				}
+
 				break;
 			case RCH__242:
+				setReg(nibble1, cache__242[nibble2]);
 				break;
 			case WCH__242:
+				cache__242[nibble1] = nibble2;
 				break;
 			default:
 				break;
