@@ -10,8 +10,10 @@
 #define BIT__242 0x04
 #define BRH__242 0x05
 #define CAL__242 0x06
-#define RET__242 0x07
+#define IJP__242 0x07
 #define ACH__242 0x08
 #define SCH__242 0x09
 #define RCH__242 0x0A
 #define WCH__242 0x0B
+#define RPT__242 0x0C
+#define WPT__242 0x0D

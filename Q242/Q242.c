@@ -22,8 +22,12 @@ u8 call_stack_ptr__242 = 0;
 u8 binary__242[BINARY_SIZE__242];
 u8 RAM__242[RAM_SIZE__242];
 u8 cache__242[16];
-u8 call_stack__242[CALL_STACK_SIZE__242];
+u16 call_stack__242[CALL_STACK_SIZE__242];
 u8 registers__242[REG_COUNT__242 + 1];
+
+typedef struct Port Port;
+
+Port ports__242[16];
 
 void init242() {
 
@@ -61,10 +65,13 @@ usize exec242(const usize cycles) {
 	u8 nibble3;
 
 	for(usize i = 0; i < cycles; i++) {
-		nibble0 = byte0 && 0xF0;
-		nibble1 = byte0 && 0x0F;
-		nibble2 = byte1 && 0xF0;
-		nibble3 = byte1 && 0x0F;
+		nibble0 = byte0 & 0xF0;
+		nibble1 = byte0 & 0x0F;
+		nibble2 = byte1 & 0xF0;
+		nibble3 = byte1 & 0x0F;
+
+		nibble0 >>= 4;
+		nibble2 >>= 4;
 
 		switch(nibble0) {
 			case ADD__242:
@@ -95,13 +102,18 @@ usize exec242(const usize cycles) {
     			break;
 			case CAL__242:
 				if((((ZF__242 << 1) | CF__242) != (nibble2 & 0x3)) == !(nibble2 & 0x4)) {
-					push(call_stack__242, call_stack_ptr__242, PC);
-					PC = (regs[nibble1] - 1) << 1;
+					if(nibble2 & 0x8) {
+						push(call_stack__242, call_stack_ptr__242, PC);
+						PC = (regs[nibble1] - 1) << 1;
+					} else {
+						pop(call_stack__242, call_stack_ptr__242, PC);
+						PC -= 2;
+					}
 				}
 
 				break;
-			case RET__242:
-				pop(call_stack__242, call_stack_ptr__242, PC) - 2;
+			case IJP__242:
+				PC = (byte1 - 1) << 1;
 				break;
 			case ACH__242:
 				for(u8 i = 0; i < 16; i++) {
@@ -121,10 +133,21 @@ usize exec242(const usize cycles) {
 			case WCH__242:
 				cache__242[nibble1] = nibble2;
 				break;
+			case RPT__242:
+				setReg(nibble1, ports__242[nibble2].output);
+				break;
+			case WPT__242:
+				port_handlePort(ports__242[nibble2], nibble1);
+				break;
 			default:
 				break;
 		}
+
+		PC += 2;
 	}
+
+	PC__242 = PC;
+	return cycles;
 }
 
 #undef setReg
