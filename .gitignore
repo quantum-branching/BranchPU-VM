@@ -6,6 +6,11 @@ Build/Benchmark/
 *.exe
 *.txt
 
+# Temp Compiler Files
+*.o
+*.asm
+*.s
+
 # Test Binaries (MC Architectures)
 *.q240x
 *.q242x
