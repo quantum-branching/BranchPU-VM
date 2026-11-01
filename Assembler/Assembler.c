@@ -2,10 +2,12 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
+#include "Assembler.h"
+
 extern const char _binary_Assembler_lua_start[];
 extern const char _binary_Assembler_lua_end[];
 
-int main(int argc, char **argv) {
+int assembler__q242(int argc, char **argv) {
     lua_State *L = luaL_newstate();
     luaL_openlibs(L);
 
