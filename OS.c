@@ -21,9 +21,11 @@ void sleepms(int ms);
 #else
 
 	#include <time.h>
+	#include <unistd.h>
+	#include <sys/syscall.h>
 
 	static inline void clear_screen() {
-		printf("\x1b[2J\x1b[H");
+		printf("\e[H\e[2J\e[3J");
 	}
 
 void sleepms(int ms) {

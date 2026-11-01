@@ -13,70 +13,59 @@
 #include "../IO/Port.c"
 #include "../IO/GPU.h"
 
-#define binary binary__280
-#define programCounter programCounter__280
-#define registers registers__280
-#define accumulator accumulator__280
-#define conditionFlag conditionFlag__280
-#define jmpStack jmpStack__280
-#define valStack valStack__280
-#define ports ports__280
-
 #define mask(value) ((value) & BYTE_MASK) /// Masks the value to be within 0 - 255, ensuring that it stays within the bounds of a byte
-#define set(value) if(mod & IMMEDIATE_FLAG) { acc = mask(value); } else { registers[data] = mask(value); } /// Sets either the accumulator or a register to a value, depending on the state of the immediate flag in the modifier
+#define set(value) if(mod & IMMEDIATE_FLAG) { accumulator__280 = mask(value); } else { registers__280[data] = mask(value); } /// Sets either the accumulator or a register to a value, depending on the state of the immediate flag in the modifier
 
 #define JUMP ((INSTRUCTION_STEP * ((mod << MOD_OFFSET) | data) - INSTRUCTION_STEP) & BINARY_MASK)
-#define CURRENT_PORT ports[mod]
+#define CURRENT_PORT ports__280[mod]
 
 #define opcode (byte1 >> INSTRUCTION_OFFSET) // The opcode of the instruction (first 5 bits of byte1)
-#define regData ((mod & IMMEDIATE_FLAG) ? data : registers[data]) // The data to be used in the instruction
+#define regData ((mod & IMMEDIATE_FLAG) ? data : registers__280[data]) // The data to be used in the instruction
 
-#define acc accumulator
-#define pc programCounter
-#define cond conditionFlag
+#define pc programCounter__280
 #define data byte2
 
 /// The binary program loaded into the CPU, which can hold up to 4096 bytes of instructions and data
 uint8_t binary[BINARY_SIZE];
 
 /// The current program counter, which points to the current instruction in the binary
-int programCounter;
+int programCounter__280;
 
 /// The state of the CPU's registers, which can hold any value from 0 to 255
-uint32_t registers[REGISTERS_SIZE];
+uint32_t registers__280[REGISTERS_SIZE];
 
 /// The accumulator, which can hold any value from 0 to 255
-uint32_t accumulator;
+uint32_t accumulator__280;
 
 /// The condition flag, which can hold either 0 or 1
-int conditionFlag;
+int conditionFlag__280;
 
 /// The stack for storing return 11-bit addresses for jumps and calls
 struct Stack jmpStack;
 
 /// The stack for storing 8-bit values, helpful for storing temporary values
-struct Stack valStack;
+struct Stack valStack__280;
 
 /// The ports for input and output
-struct Port ports[8];
+struct Port ports__280[8];
 
 void init280() {
-	programCounter = 0;
-	accumulator = 0;
-	conditionFlag = 0;
+	programCounter__280 = 0;
+	accumulator__280 = 0;
+	conditionFlag__280 = 0;
 	jmpStack.index = 0;
-	valStack.index = 0;
+	valStack__280.index = 0;
 
 	for (int i = 0; i < REGISTERS_SIZE; i++) {
-		registers[i] = 0;
+		registers__280[i] = 0;
 	}
 
 	for (int i = 0; i < PORTS_SIZE; i++) {
-		ports[i].input = 0;
-		ports[i].output = 0;
+		ports__280[i].input = 0;
+		ports__280[i].output = 0;
 	}
 
-	ports[1].update = GPU_p26;
+	ports__280[1].update = GPU_p26;
 }
 
 void exec280(const int cycles) {
@@ -98,34 +87,34 @@ void exec280(const int cycles) {
 				pc = JUMP;
 				break;
 			case ADD__280:
-				acc = mask(acc + regData);
+				accumulator__280 = mask(accumulator__280 + regData);
 				break;
 			case SUB__280:
-				acc = mask(acc - regData);
+				accumulator__280 = mask(accumulator__280 - regData);
 				break;
 			case LSH__280:
-				acc = mask(acc << regData);
+				accumulator__280 = mask(accumulator__280 << regData);
 				break;
 			case RSH__280:
-				acc = (acc >> regData);
+				accumulator__280 = (accumulator__280 >> regData);
 				break;
 			case AND__280:
-				acc = (acc & regData);
+				accumulator__280 = (accumulator__280 & regData);
 				break;
 			case OR__280:
-				acc = (acc | regData);
+				accumulator__280 = (accumulator__280 | regData);
 				break;
 			case XOR__280:
-				acc = (acc ^ regData);
+				accumulator__280 = (accumulator__280 ^ regData);
 				break;
 			case LDA__280:
-				acc = regData;
+				accumulator__280 = regData;
 				break;
 			case STA__280:
-				registers[data] = acc;
+				registers__280[data] = accumulator__280;
 				break;
 			case CND__280:
-				if (cond) {
+				if(conditionFlag__280) {
 					pc = JUMP;
 				}
 				break;
@@ -137,35 +126,35 @@ void exec280(const int cycles) {
 				pc = stack_pop(&jmpStack) & BINARY_MASK;
 				break;
 			case CMP__280:
-				cond = mod >> 2;
-				if(((CMP_LT_FLAG & mod) && acc < registers[data]) || ((CMP_EQ_FLAG & mod) && acc == registers[data])) {
-					invert(cond);
+				conditionFlag__280 = mod >> 2;
+				if(((CMP_LT_FLAG & mod) && accumulator__280 < registers__280[data]) || ((CMP_EQ_FLAG & mod) && accumulator__280 == registers__280[data])) {
+					invert(conditionFlag__280);
 				}
 				break;
 			case ICP__280:
-				cond = mod >> 2;
-				if(((CMP_LT_FLAG & mod) && acc < data) || ((CMP_EQ_FLAG & mod) && acc == data)) {
-					invert(cond);
+				conditionFlag__280 = mod >> 2;
+				if(((CMP_LT_FLAG & mod) && accumulator__280 < data) || ((CMP_EQ_FLAG & mod) && accumulator__280 == data)) {
+					invert(conditionFlag__280);
 				}
 				break;
 			case STK__280:
 				if (mod & STK_POP_FLAG) {
-					set(stack_pop(&valStack));
+					set(stack_pop(&valStack__280));
 				} else {
-					stack_push(&valStack, regData);
+					stack_push(&valStack__280, regData);
 				}
 				break;
 			case RPA__280:
-				acc = mask(CURRENT_PORT.output);
+				accumulator__280 = mask(CURRENT_PORT.output);
 				break;
 			case RPR__280:
-				registers[DATA_OFFSET] = CURRENT_PORT.output;
+				registers__280[DATA_OFFSET] = CURRENT_PORT.output;
 				break;
 			case WPA__280:
-				port_handlePort(CURRENT_PORT, acc);
+				port_handlePort(CURRENT_PORT, accumulator__280);
 				break;
 			case WPR__280:
-				port_handlePort(CURRENT_PORT, registers[data]);
+				port_handlePort(CURRENT_PORT, registers__280[data]);
 				break;
 		}
 
@@ -174,11 +163,8 @@ void exec280(const int cycles) {
 }
 
 void printState280() {
-	printf("PC: %d\n", programCounter / INSTRUCTION_STEP);
-	printf("ACC: %d\n", accumulator);
-	for (int i = 0; i < REGISTERS_SIZE; i++) {
-		printf("\t$%d: %d\n", i, registers[i]);
-	}
+	printf("PC: \t%03d\tCAL_PTR: \t%03d\n", programCounter__280 / INSTRUCTION_STEP, jmpStack.index);
+	printf("ACC: \t%03d\tVAL_PTR: \t%03d\tCND: \t  %d\n", accumulator__280, valStack__280.index,conditionFlag__280);
 }
 
 void readBin280(const char *filename) {
@@ -203,12 +189,3 @@ void speedTest280(char flag) {
 		speedTest280(flag);
 	}
 }
-
-#undef binary
-#undef programCounter
-#undef registers
-#undef accumulator
-#undef conditionFlag
-#undef jmpStack
-#undef valStack
-#undef ports
