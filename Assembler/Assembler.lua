@@ -118,14 +118,17 @@ end
 defs_location = 0
 defs_length = string.len(defs)
 
+rename_flag = false
+temp_name = ""
+local result = ""
+
 for index, value in ipairs(arg) do
-	local is_flag = string.find(value, "-")
 	
-	if is_flag then
-		
+	if string.find(value, "-") then
+		rename_flag = string.find(value, "-o") or false
 	else
 		definition = ""
-		local result = readFile(value)
+		result = readFile(value)
 
 		while defs_location <= defs_length - 1 do
 			local next_line = (string.find(defs, "\n", defs_location) or (defs_length + 1))
@@ -140,7 +143,13 @@ for index, value in ipairs(arg) do
 			defs_location = next_line + 1
 		end
 
-		writeBinary(string.gsub(value, "%.q242", ".q242x"), result)
+		if rename_flag then
+			writeBinary(value, result)
+		else
+			temp_name = string.gsub(value, "%.q242", ".q242x")
+		end
 	end
 end
+
+if not rename_flag then writeBinary(temp_name, result) end
 
