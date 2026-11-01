@@ -1,6 +1,2 @@
-*.bpu linguist-language=Assembly
-*.q240 linguist-language=Assembly
-*.q280 linguist-language=Assembly
-
 *.sh linguist-documentation
 *.bat linguist-documentation
