@@ -1,0 +1,12 @@
+.vscode/
+Build/Benchmark/
+
+# Debug Binaries (IRL Architectures)
+*.x86_64
+*.exe
+*.txt
+
+# Test Binaries (MC Architectures)
+*.q240x
+*.q242x
+*.q280x

@@ -9,9 +9,9 @@
 
 /// Internal registers
 #define NULL_DEST__240 16
-#define CND_FLAG__240 (registers[17])
-#define STACK_PTR__240 (registers[18])
-#define PC_STACK_PTR__240 (registers[19])
+#define CND_FLAG__240 (registers__240[17])
+#define STACK_PTR__240 (registers__240[18])
+#define PC_STACK_PTR__240 (registers__240[19])
 
 /// User registers and internal registers
 #define VIRTUAL_REGS__240 20
