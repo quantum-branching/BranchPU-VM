@@ -5,6 +5,7 @@
 #include "Q280/Q280.h"
 #include "Q240/Q240.h"
 #include "Q242/Q242.h"
+#include "Assembler/Assembler.h"
 
 #include "IO/GPU.h"
 #include "OS.c"
@@ -55,15 +56,15 @@ int main(int argc, char **argv) {
 		} else {
 			switch(argv[i][1]) {
 				case 'a':
-					puts("Assembler not complete");
+					assembler__q242(argc - i, argv + i);
 					return 0;
 				case 's':
 					if(version == 240) {
 						speedTest240(argv[i][2]);
-					   		} else if(version == 280) {
+					} else if(version == 280) {
 						speedTest280(argv[i][2]);
 					} else {
-						printf("Architecture not supported: .q%dx\n", version);
+						printf("Architecture not supported for testing speed: .q%dx\n", version);
 					}
 
 					return 0;
