@@ -33,6 +33,7 @@ int main(int argc, char **argv) {
 						unpack240();
 						break;
 					case 242:
+						init242();
 						readBin242(argv[i]);
 						break;
 					case 280:
@@ -40,7 +41,7 @@ int main(int argc, char **argv) {
 						readBin280(argv[i]);
 						break;
 					default:
-						printf("Architecture not supported: %s\n", file_ext);
+						printf("Architecture not supported: .q%dx\n", version);
 				}
 
 			} else {
@@ -59,12 +60,19 @@ int main(int argc, char **argv) {
 					assembler__q242(argc - i, argv + i);
 					return 0;
 				case 's':
-					if(version == 240) {
-						speedTest240(argv[i][2]);
-					} else if(version == 280) {
-						speedTest280(argv[i][2]);
-					} else {
-						printf("Architecture not supported for testing speed: .q%dx\n", version);
+					switch(version) {
+						case 240:
+							speedTest240(argv[i][2]);
+							break;
+						case 242:
+							speedTest242(argv[i][2]);
+							break;
+						case 280:
+							speedTest280(argv[i][2]);
+							break;
+						default:
+							printf("Architecture not supported for testing speed: .q%dx\n", version);
+							break;
 					}
 
 					return 0;
@@ -84,6 +92,14 @@ int main(int argc, char **argv) {
 			printState240();
 			printScreen();
 			puts("");
+			sleepms(5);
+		}
+	} else if(version == 242) {
+		for(;;) {
+			exec242(240);
+			// clear_screen();
+			// printScreen();
+			// puts("");
 			sleepms(5);
 		}
 	} else if(version == 280) {

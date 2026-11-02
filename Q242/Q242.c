@@ -30,7 +30,7 @@ typedef struct Port Port;
 Port ports__242[16];
 
 void init242() {
-
+	ports__242[1].update = GPU_p26;
 }
 
 void readBin242(const char *filename) {
@@ -55,6 +55,7 @@ inline u8 destination242(u8 destNibble) {
 #define byte1 binary[PC + 1]
 
 #define setReg(destNibble, value) regs[(destNibble) ? (destNibble) : REG_COUNT__242] = value
+#define normalizePC(pc) ((pc) % BINARY_SIZE__242)
 
 usize exec242(const usize cycles) {
 	u16 PC = PC__242;
@@ -98,22 +99,22 @@ usize exec242(const usize cycles) {
 				setReg(nibble1, (xor | (ior & ior_flag) | (nor & nor_flag)) ^ inv_flag);
 				break;
 			case BRH__242:
-				PC = ((((ZF__242 << 1) | CF__242) != (nibble2 & 0x3)) == !(nibble2 & 0x4)) ? (regs[nibble1] - 1) << 1 : PC;
+				PC = ((((ZF__242 << 1) | CF__242) != (nibble2 & 0x3)) == !(nibble2 & 0x4)) ? normalizePC((regs[nibble1] - 1) << 1) : PC;
     			break;
 			case CAL__242:
 				if((((ZF__242 << 1) | CF__242) != (nibble2 & 0x3)) == !(nibble2 & 0x4)) {
 					if(nibble2 & 0x8) {
 						push(call_stack__242, call_stack_ptr__242, PC);
-						PC = (regs[nibble1] - 1) << 1;
+						PC = normalizePC((regs[nibble1] - 1) << 1);
 					} else {
 						pop(call_stack__242, call_stack_ptr__242, PC);
-						PC -= 2;
+						PC = normalizePC(PC - 2);
 					}
 				}
 
 				break;
 			case IJP__242:
-				PC = (byte1 - 1) << 1;
+				PC = normalizePC((byte1 - 1) << 1);
 				break;
 			case ACH__242:
 				for(u8 i = 0; i < 16; i++) {
@@ -143,7 +144,7 @@ usize exec242(const usize cycles) {
 				break;
 		}
 
-		PC += 2;
+		PC = normalizePC(PC + 2);
 	}
 
 	PC__242 = PC;
@@ -154,3 +155,15 @@ usize exec242(const usize cycles) {
 
 #undef binary
 #undef regs
+
+void speedTest242(char flag) {
+	clock_t start = clock();
+	#define CYCLES 500000000.0
+	exec242((usize) CYCLES);
+	double time = clock() - start;
+	printf("%f Hz\n", CLOCKS_PER_SEC * (CYCLES / time));
+
+	if(flag) {
+		speedTest242(flag);
+	}
+}

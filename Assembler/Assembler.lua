@@ -66,9 +66,9 @@ defs = [[
 0110000011000000
 	RGE
 0110000011010000
-	RLE
+	RLE 
 0110000011100000
-	RET
+	RET 
 0110000011110000
 	RNE
 01110000CCCCCCCC
@@ -141,11 +141,20 @@ local function replaceLine(line, definition, alias)
 	local result = ""
 	local c, a, b = string.match("\t" .. line, alias)
 
-	if c == nil then return line end
+	if c == nil then
+		-- print(line, alias, "Does not match")
+		return line
+	else
+		-- print(line, alias, "Matches!")
+	end
 
-	result = result.gsub(definition, "A+", intToBinary(a, count(definition, "A")))
-	result = result.gsub(result, "B+", intToBinary(b, count(definition, "B")))
-	result = result.gsub(result, "C+", intToBinary(c, count(definition, "C")))
+	a = tonumber(a)
+	b = tonumber(b)
+	c = tonumber(c)
+
+	result = string.gsub(definition, "A+", intToBinary(a, count(definition, "A")))
+	result = string.gsub(result, "B+", intToBinary(b, count(definition, "B")))
+	result = string.gsub(result, "C+", intToBinary(c, count(definition, "C")))
 	
 	return result
 end
@@ -212,12 +221,22 @@ for index, value in ipairs(arg) do
 				local has_tab = (string.find(defs, "\t", defs_location) or next_line) < next_line
 			
 				if has_tab then
-					result = replaceString(result, definition, string.sub(defs, defs_location, next_line - 1))
+					
+					alias = string.sub(defs, defs_location, next_line - 1)
+
+					-- print("Alias:" , alias)
+					-- print("------------------------------------------------------------")
+
+					result = replaceString(result, definition, alias)
 				else
 					definition = string.sub(defs, defs_location, next_line - 1)
+
+					-- print("Definition:" , definition)
+					-- print("------------------------------------------------------------")
 				end
 			
 				defs_location = next_line + 1
+				-- print(defs_location, defs_length - 1)
 			end
 
 			temp_name = string.gsub(value, "%.q242", ".q242x")
