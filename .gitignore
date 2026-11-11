@@ -1,5 +1,4 @@
 .vscode/
-Build/Benchmark/
 
 # Debug Binaries (IRL Architectures)
 *.x86_64
