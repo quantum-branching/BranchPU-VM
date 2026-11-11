@@ -1,9 +1,10 @@
 CC = gcc
 
-LUAFLAGS = $(shell pkg-config --cflags --libs lua)
+LUAFLAGS = $(shell pkg-config --cflags luajit)
+LDFLAGS = $(shell pkg-config --libs luajit)
 
 my_program: Dispatcher.o GPU.o Q240.o Q242.o Q280.o Assembler.o script.o
-	$(CC) $^ -llua5.4 -flto -o VM.x86_64
+	$(CC) $^ $(LDFLAGS) -flto -o VM.x86_64
 	strip VM.x86_64
 
 Dispatcher.o: Dispatcher.c
